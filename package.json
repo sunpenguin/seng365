@@ -4,9 +4,8 @@
   "description" : "A simple crowd funding API.",
   "keywords" : ["crowd funding", "application", "api"],
   "author" : "Sunguin Peng <spe76@uclive.ac.nz>",
-  "main" : "app.js",
   "scripts": {
-    "start": "node test.js"
+    "start": "app.js"
   },
   "dependencies": {
     "mysql": "^2.13.0",
