@@ -5,7 +5,7 @@
   "keywords" : ["crowd funding", "application", "api"],
   "author" : "Sunguin Peng <spe76@uclive.ac.nz>",
   "scripts": {
-    "start": "app.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "mysql": "^2.13.0",
