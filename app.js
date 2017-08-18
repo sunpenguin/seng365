@@ -8,6 +8,7 @@ const db = require('./config/db'),
 const app = express();
 
 // Connect to MySQL on start
+// TODO AUTHENTICATION ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
 db.connect(function(err) {
     if (err) {
         console.log('Unable to connect to MySQL.');
