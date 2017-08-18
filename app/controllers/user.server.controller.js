@@ -8,16 +8,11 @@ exports.list = function(req, res) {
 
 exports.create = function(req, res) {
     let user = req.body.user;
-
     let username = user.username.toString();
     let location = user.location.toString();
     let email = user.email.toString();
 
     let password = req.body.password.toString();
-
-    let user_details = [
-        [username, location, email]
-    ];
 
     User.insert(username, location, email, password, function(result) {
         res.json(result);
@@ -25,7 +20,12 @@ exports.create = function(req, res) {
 };
 
 exports.login = function(req, res) {
-    return null;
+    let username = req.username;
+    let password = req.password;
+
+    User.login(username, password, function(result) {
+       res.json(result);
+    });
 };
 
 exports.logout = function(req, res) {

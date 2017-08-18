@@ -10,8 +10,8 @@ module.exports = function() {
 
     app.use(bodyParser.json());
 
-    app.route('/').get(function(req,res){
-        res.json("{status:im workging")
+    app.route('/').get(function(req,res) {
+        res.json("{status:im working}")
     });
 
     require('../app/routes/user.server.routes.js')(app);

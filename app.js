@@ -1,8 +1,9 @@
 /**
- * EcksDee
+ * The main application window.
  */
 const db = require('./config/db'),
-    express = require('./config/express');
+    express = require('./config/express'),
+    tables = require('./helpful_files/tableCreator');
 
 const app = express();
 
@@ -17,3 +18,5 @@ db.connect(function(err) {
         });
     }
 });
+
+tables.createTables();
