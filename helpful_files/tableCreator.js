@@ -8,9 +8,14 @@ exports.createTables = function(req, res) {
     createUserTable();
     createProjectTable();
     createRewardTable();
+};
+
+exports.createDependentTables = function(req, res) {
     createPledgeTable();
     createCreateTable();
 };
+
+exports.addData
 
 function createUserTable() {
     let user =

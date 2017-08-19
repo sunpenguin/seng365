@@ -15,8 +15,7 @@ module.exports = function() {
     });
 
     require('../app/routes/user.server.routes.js')(app);
-
-
+    require('../app/routes/project.server.routes')(app);
 
     return app;
 };

@@ -41,8 +41,8 @@ exports.create = function(req, res) {
 };
 
 exports.login = function(req, res) {
-    let username = req.username;
-    let password = req.password;
+    let username = req.body.username;
+    let password = req.body.password;
 
     User.login(username, password, function(result) {
         switch (result) {
@@ -57,7 +57,18 @@ exports.login = function(req, res) {
 };
 
 exports.logout = function(req, res) {
-    return null;
+    let token = req.get('X-Authorization');
+
+    User.logout(token, function(result) {
+        switch (result) {
+            case 401:
+                res.status(result).send("Unauthorized - already logged out");
+                break;
+            default:
+                res.status(200).send("OK");
+                break;
+        }
+    });
 };
 
 
@@ -103,6 +114,15 @@ exports.update = function(req, res) {
 
     User.alter(uid, username, location, email, password, function(result) {
         switch (result) {
+            case 400:
+                res.status(result).send("Malformed request");
+                break;
+            case 401:
+                res.status(result).send("Unauthorized - not logged in");
+                break;
+            case 403:
+                res.status(result).send("Forbidden - account not owned");
+                break;
             case 404:
                 res.status(result).send("User not found");
                 break;
@@ -122,8 +142,9 @@ exports.update = function(req, res) {
  */
 exports.delete = function(req, res) {
     let uid = req.params.id;
+    let token = req.get('X-Authorization');
 
-    User.remove(uid, function(result) {
+    User.remove(uid, token, function(result) {
         switch (result) {
             case 401:
                 res.status(result).send("Unauthorized - not logged in");

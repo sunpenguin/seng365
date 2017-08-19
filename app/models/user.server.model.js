@@ -1,6 +1,5 @@
 const db = require('../../config/db.js');
 
-
 /**
  * Gets all the users from the database. Will be useless since it is not a Swaffer requirement.
  *
@@ -62,35 +61,54 @@ exports.insert = function(username, location, email, password,  done) {
 };
 
 
+/**
+ * Generates and puts the authentication token to the user_id.
+ *
+ * @param uid
+ * @param done
+ */
+function updateAuth(uid, done) {
+    // Generate random string.
+    require('crypto').randomBytes(4, function(err, buffer) {
+
+
+        let token = buffer.toString('hex');
+
+        let sql = "UPDATE User SET authentication = \'" + token + "\' WHERE user_id = " + uid;
+        db.get().query(sql, function(err, result) {
+        });
+
+        sql = "SELECT user_id, authentication FROM User WHERE user_id = " + uid;
+
+        db.get().query(sql, function(err, result) {
+            done(result);
+        });
+    });
+}
+
 exports.login = function(username, password, done) {
     let sql = "SELECT user_id FROM User WHERE username = \'" + username + "\' and password = \'" + password + "\'";
-    let id = -1;
-    let token = -1;
 
     db.get().query(sql, function(err, result) {
+
         if (err) return done(400);
 
-        id = result;
-    });
+        let id = result[0].user_id;
 
-    // Generate random string.
-    require('crypto').randomBytes(16, function(err, buffer) {
-
-        token = buffer.toString('hex');
-    });
-
-    sql = "UPDATE User SET authentication = \'" + token + "\' WHERE user_id = " + id;
-    db.get().query(sql, function(err, result) {
-
-        if (err) return done(err);
-
-        console.log(done(id + " " + token));
+        updateAuth(id, done);
     });
 };
 
 
-exports.logout = function() {
-    return null;
+exports.logout = function(token, done) {
+    let sql = "UPDATE User SET authentication = NULL WHERE authentication = \'" + token + "\'";
+
+    db.get().query(sql, function(err, result) {
+
+        if (err) return done(401);
+
+        done(200);
+    });
 };
 
 
@@ -108,10 +126,18 @@ exports.alter = function(uid, username, location, email, password, done) {
 };
 
 
-exports.remove = function(uid, done) {
+exports.remove = function(uid, token, done) {
     // Check token value is not null. Return code 401 if null.
+
+
     // Check token matches header. If no code 403.
-    let sql = "UPDATE User SET active = false WHERE user_id = " + uid;
+    let sql = "SELECT * FROM User WHERE authentication = \'" + token + "\'";
+
+    db.get().query(sql, function(err, result) {
+        if (err) return done(403);
+    });
+
+    sql = "UPDATE User SET active = false WHERE user_id = " + uid + "AND authentication = \'" + token + "\'";
 
     db.get().query(sql, function(err, result) {
 

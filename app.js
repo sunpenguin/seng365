@@ -21,3 +21,4 @@ db.connect(function(err) {
 });
 
 tables.createTables();
+tables.createDependentTables();
