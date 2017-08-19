@@ -8,7 +8,7 @@ const db = require('./config/db'),
 const app = express();
 
 // Connect to MySQL on start
-// TODO AUTHENTICATION ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+// TODO Go through and check that all authorizations say the correct messages.
 db.connect(function(err) {
     if (err) {
         console.log('Unable to connect to MySQL.');
@@ -19,6 +19,7 @@ db.connect(function(err) {
         });
     }
 });
+
 
 tables.createTables();
 tables.createDependentTables();

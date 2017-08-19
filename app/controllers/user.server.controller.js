@@ -40,6 +40,7 @@ exports.create = function(req, res) {
     });
 };
 
+// TODO Check that these values are supposed to be in the header or body!
 exports.login = function(req, res) {
     let username = req.body.username;
     let password = req.body.password;

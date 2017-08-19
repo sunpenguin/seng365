@@ -71,17 +71,15 @@ function updateAuth(uid, done) {
     // Generate random string.
     require('crypto').randomBytes(4, function(err, buffer) {
 
-
         let token = buffer.toString('hex');
 
         let sql = "UPDATE User SET authentication = \'" + token + "\' WHERE user_id = " + uid;
         db.get().query(sql, function(err, result) {
-        });
+            sql = "SELECT user_id, authentication FROM User WHERE user_id = " + uid;
 
-        sql = "SELECT user_id, authentication FROM User WHERE user_id = " + uid;
-
-        db.get().query(sql, function(err, result) {
-            done(result);
+            db.get().query(sql, function(err, result) {
+                done(result);
+            });
         });
     });
 }
@@ -118,7 +116,7 @@ exports.alter = function(uid, username, location, email, password, done) {
 
     db.get().query(sql, function(err, result) {
 
-        if (err) return done(404);
+        if (err || result.affectedRows === 0) return done(404);
 
         // Give out correct result
         done(result);

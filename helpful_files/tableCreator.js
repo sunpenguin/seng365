@@ -4,18 +4,16 @@
 
 const db = require('../config/db.js');
 
-exports.createTables = function(req, res) {
+exports.createTables = function() {
     createUserTable();
     createProjectTable();
     createRewardTable();
 };
 
-exports.createDependentTables = function(req, res) {
+exports.createDependentTables = function() {
     createPledgeTable();
-    createCreateTable();
+    createCreatorTable();
 };
-
-exports.addData
 
 function createUserTable() {
     let user =
@@ -43,12 +41,14 @@ function createProjectTable() {
         "CREATE TABLE IF NOT EXISTS Project" +
         "(" +
             "proj_id     INT AUTO_INCREMENT," +
+            "creationDate   VARCHAR(20) NOT NULL," +
             "title       VARCHAR(50) NOT NULL," +
             "subtitle    VARCHAR(50)," +
             "description VARCHAR(200)," +
             "image       VARCHAR(20)," +
             "target      INT," +
-            "number_of_backers   INT," +
+            "open    BOOLEAN NOT NULL DEFAULT 0," +
+            "number_of_backers   INT DEFAULT 0," +
             "PRIMARY KEY (proj_id)" +
         ");";
 
@@ -63,7 +63,7 @@ function createRewardTable() {
     let reward =
         "CREATE TABLE IF NOT EXISTS Reward" +
         "(" +
-            "reward_id   INT AUTO_INCREMENT," +
+            "reward_id   INT," +
             "proj_id     INT," +
             "amount      INT," +
             "description VARCHAR(200)," +
@@ -99,12 +99,13 @@ function createPledgeTable() {
     });
 }
 
-function createCreateTable() {
+function createCreatorTable() {
     let create =
         "CREATE TABLE IF NOT EXISTS Creator" +
         "(" +
             "user_id INT," +
             "proj_id INT," +
+            "name    VARCHAR(30)," +
             "PRIMARY KEY (user_id, proj_id)," +
             "FOREIGN KEY (user_id) REFERENCES User(user_id)," +
             "FOREIGN KEY (proj_id) REFERENCES Project(proj_id)" +
