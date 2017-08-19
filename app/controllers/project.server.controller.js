@@ -85,3 +85,43 @@ exports.updateImage = function() {
 exports.pledge = function() {
     return null;
 };
+
+exports.viewRewards = function(req, res) {
+    let pid = req.params.id;
+
+    Project.getRewards(pid, function(result) {
+        switch (result) {
+            case 404:
+                res.status(result).send("Not found");
+                break;
+            default:
+                res.status(200).send(result);
+                break;
+        }
+    });
+};
+
+exports.updateRewards = function(req, res) {
+    let pid = req.params.id;
+    let rewards = req.body;
+
+    Project.newRewards(pid, rewards, function(result) {
+        switch (result) {
+            case 400:
+                res.status(result).send("Malformed request");
+                break;
+            case 401:
+                res.status(result).send("Unauthorized - create account to update project");
+                break;
+            case 403:
+                res.status(result).send("Forbidden - unable to update a project you do not own");
+                break;
+            case 404:
+                res.status(result).send("Not found");
+                break;
+            default:
+                res.status(201).send(result);
+                break;
+        }
+    });
+};

@@ -25,6 +25,12 @@ module.exports = function(app) {
 
     app.route('/projects/:id/pledge')
         .post(projects.pledge); // Validate
+
+    app.route('/projects/:id/rewards')
+        .get(projects.viewRewards);
+
+    app.route('/projects/:id/rewards', validateToken)
+        .put(projects.updateRewards);
 };
 
 const validateToken = (req, res, next) => {

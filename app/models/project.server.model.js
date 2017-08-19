@@ -105,3 +105,41 @@ exports.update = function(pid, open, done) {
         done("OK");
     });
 };
+
+
+exports.getRewards = function(pid, done) {
+    let sql = "SELECT reward_id, amount, description FROM Reward WHERE proj_id = " + pid;
+
+    db.get().query(sql, function(err, result) {
+        if (err || JSON.stringify(result) === "[]") return done(404);
+
+        done(result);
+    });
+};
+
+exports.newRewards = function(pid, rewards, done) {
+    let sql = "DELETE FROM Reward WHERE proj_id = " + pid + " AND reward_id IN ?";
+    let existing = [];
+    for (let i = 0; i < rewards.length; i++) {
+        existing.push(rewards[i].reward_id);
+    }
+
+    db.get().query(sql, [[existing]], function(err, result) {
+        if (err) return done(err);
+
+        // Check for error 403 by checking the creators of the project.
+
+        let sqlNewRewards = "INSERT INTO Reward (reward_id, proj_id, amount, description) VALUES ?";
+
+        let newData = [];
+        for (let i = 0; i < rewards.length; i++) {
+            newData.push([rewards[i].id, pid, rewards[i].amount, rewards[i].description]);
+        }
+
+        db.get().query(sqlNewRewards, [newData], function(err, result) {
+            if (err) return done(err);
+
+            done("OK");
+        });
+    });
+};

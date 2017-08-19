@@ -32,7 +32,7 @@ exports.getOne = function(uid, done) {
 
     db.get().query(sql, function (err, rows) {
 
-        if (err || JSON.stringify(rows) == "[]") return done(404);
+        if (err || JSON.stringify(rows) === "[]") return done(404);
 
         return done(rows);
     });
