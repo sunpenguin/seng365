@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS User
     email       VARCHAR(40) NOT NULL,
     password    VARCHAR(40),
     authentication   VARCHAR(20),
+    active  BOOLEAN NOT NULL DEFAULT 1,
     PRIMARY KEY (user_id)
 );
 
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS Pledge
     FOREIGN KEY (proj_id) REFERENCES Project(proj_id)
 );
 
-CREATE TABLE IF NOT EXISTS Creates
+CREATE TABLE IF NOT EXISTS Creator
 (
     user_id INT,
     proj_id INT,

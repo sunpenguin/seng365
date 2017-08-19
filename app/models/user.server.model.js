@@ -1,5 +1,6 @@
 const db = require('../../config/db.js');
 
+
 /**
  * Gets all the users from the database. Will be useless since it is not a Swaffer requirement.
  *
@@ -14,37 +15,60 @@ exports.getAll = function(done) {
     });
 };
 
+
+/**
+ * Gets a single user from the database.
+ *
+ * @param uid the user id to query for
+ * @param done the function to return
+ * @returns if ther are errors, return the error code, else return the first person found with that id
+ */
+// TODO: Do I need to only get a single value or just leave it in a list format?
 exports.getOne = function(uid, done) {
+    if (isNaN(uid)) {
+        return done(400);
+    }
+
     let sql = "SELECT user_id, username, location, email FROM User WHERE user_id = " + uid
 
     db.get().query(sql, function (err, rows) {
 
-        if (err) return done(err);
+        if (err || JSON.stringify(rows) == "[]") return done(404);
 
         return done(rows);
     });
 };
 
+
+/**
+ * Inserts a new user into the database.
+ *
+ * @param username
+ * @param location
+ * @param email
+ * @param password
+ * @param done
+ */
 exports.insert = function(username, location, email, password,  done) {
     let sql = 'INSERT INTO User (username, location, email, password) VALUES (\''
         + username + '\', \'' + location + '\', \'' + email + '\', \'' + password + '\')';
 
     db.get().query(sql, function(err, result) {
 
-        if (err) return done({400: "Malformed request"});
+        if (err) return done(400);
 
-        // Get the user id and return it here with code 201
-        done(result);
+        done(JSON.stringify(result.insertId));
     });
 };
 
+
 exports.login = function(username, password, done) {
-    let sql = "SELECT id FROM User WHERE username = \'" + username + "\' and password = \'" + password + "\'";
+    let sql = "SELECT user_id FROM User WHERE username = \'" + username + "\' and password = \'" + password + "\'";
     let id = -1;
     let token = -1;
 
     db.get().query(sql, function(err, result) {
-        if (err) return done(err);
+        if (err) return done(400);
 
         id = result;
     });
@@ -55,40 +79,45 @@ exports.login = function(username, password, done) {
         token = buffer.toString('hex');
     });
 
-    sql = "UPDATE User SET authentication = \'" + token + "\' WHERE id = " + id;
+    sql = "UPDATE User SET authentication = \'" + token + "\' WHERE user_id = " + id;
     db.get().query(sql, function(err, result) {
 
         if (err) return done(err);
 
-        done(id + " " + token);
+        console.log(done(id + " " + token));
     });
 };
+
 
 exports.logout = function() {
     return null;
 };
 
+
 exports.alter = function(uid, username, location, email, password, done) {
     let sql = "UPDATE User SET username = \'" + username + "\' , location = \'" + location + "\' , email = \'" +
-        email + "\', password = \'" + password + "\' WHERE user_id = " + uid
+        email + "\', password = \'" + password + "\' WHERE user_id = " + uid;
 
     db.get().query(sql, function(err, result) {
 
-        if (err) return done({404:"User not found"});
+        if (err) return done(404);
 
         // Give out correct result
         done(result);
     });
 };
 
+
 exports.remove = function(uid, done) {
-    let sql = "DELETE FROM User WHERE user_id = " + uid;
+    // Check token value is not null. Return code 401 if null.
+    // Check token matches header. If no code 403.
+    let sql = "UPDATE User SET active = false WHERE user_id = " + uid;
 
     db.get().query(sql, function(err, result) {
 
-        if (err) return done({404:"User not found"});
+        if (err) return done(404);
 
         // Give out correct result
-        done(result);
+        done(200);
     });
 };

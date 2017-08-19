@@ -1,5 +1,5 @@
 /**
- * Created by spe76 on 18/08/17.
+ * Creates necessary tables when missing.
  */
 
 const db = require('../config/db.js');
@@ -22,6 +22,7 @@ function createUserTable() {
             "email       VARCHAR(40) NOT NULL," +
             "password    VARCHAR(40)," +
             "authentication   VARCHAR(20)," +
+            "active BOOLEAN NOT NULL DEFAULT 1," +
             "PRIMARY KEY (user_id)" +
         ");";
 
@@ -95,7 +96,7 @@ function createPledgeTable() {
 
 function createCreateTable() {
     let create =
-        "CREATE TABLE IF NOT EXISTS Creates" +
+        "CREATE TABLE IF NOT EXISTS Creator" +
         "(" +
             "user_id INT," +
             "proj_id INT," +
