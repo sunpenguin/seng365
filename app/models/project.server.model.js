@@ -1,4 +1,5 @@
 const db = require('../../config/db.js');
+const fs = require('fs');
 
 exports.getAll = function(startIndex, count, done) {
     let last = startIndex + count;
@@ -13,10 +14,10 @@ exports.getAll = function(startIndex, count, done) {
 
 exports.createProject = function(title, subtitle, description, target, creators, rewards, done) {
     let sql = "INSERT INTO Project (creationDate, title, subtitle, description, target) VALUES (\'" + parseInt(getToday())
-        + "\', \'" + title + "\', \'" + subtitle + "\', \'" + description + "\', " + target + ")";
+        + "\', \'" + title + "\', \'" + subtitle + "\', \'" + description + "\', " + parseInt(target) + ")";
 
     db.get().query(sql, function(err, result) {
-        if (err) return done(400);
+        if (err) return done(err);
 
         let proj_id = result.insertId;
 
@@ -27,8 +28,6 @@ exports.createProject = function(title, subtitle, description, target, creators,
         }
 
         db.get().query(sqlCreators, [valuesCreators], function(err, result) {
-            if (err) return done(err);
-
             let sqlRewards = "INSERT INTO Reward (reward_id, proj_id, amount, description) VALUES ?";
             let valuesRewards = [];
             for (let i = 0; i < rewards.length; i++) {
@@ -36,8 +35,6 @@ exports.createProject = function(title, subtitle, description, target, creators,
             }
 
             db.get().query(sqlRewards, [valuesRewards], function(err, result) {
-                if (err) return done(400);
-
                 done(JSON.stringify(proj_id));
             });
         });
@@ -157,7 +154,7 @@ exports.getOne = function(pid, done) {
 };
 
 exports.update = function(pid, open, done) {
-    let sql = "UPDATE Project SET open = " + open.toUpperCase() + " WHERE proj_id = " + pid;
+    let sql = "UPDATE Project SET open = " + open + " WHERE proj_id = " + pid;
 
     db.get().query(sql, function(err, result) {
         if (err) return done(403);
@@ -166,18 +163,32 @@ exports.update = function(pid, open, done) {
     });
 };
 
+
 exports.getImage = function(pid, done) {
-    let sql = "SELECT image FROM Project WHERE proj_id = " + pid;
+    let sql = "SELECT image FROM Project WHERE proj_id =" + pid;
 
     db.get().query(sql, function(err, result) {
-        if (err) return done(404);
 
-        done(result[0].image);
+        let path = result[0].image;
+        // console.log(path);
+
+        if (fs.existsSync(path)) {
+            done(path);
+        } else {
+            done(404);
+        }
     });
 };
 
-exports.newImage = function(pid, done) {
-    let sql = ""
+exports.newImage = function(pid, filename, done) {
+    // console.log(blob.toString());
+    let sql = "UPDATE Project SET image = \'images/" + filename + "\' WHERE proj_id = " + pid;
+
+    db.get().query(sql, function(err, result) {
+        if (err) return done(err);
+
+        done("OK");
+    });
 };
 
 exports.createPledge = function(pid, backerId, amount, anonymous, token, done) {
@@ -207,7 +218,11 @@ exports.createPledge = function(pid, backerId, amount, anonymous, token, done) {
                 db.get().query(sqlCreatePledge, [pledgeDetails], function(err, result) {
                     if (err) return done(err);
                     // Increment number of backers!!!
-                    done("OK");
+                    let sqlBackers = "UPDATE Project SET number_of_backers = number_of_backers + 1 WHERE proj_id = " + pid;
+
+                    db.get().query(sqlBackers, function(err, result) {
+                        done("OK");
+                    });
                 });
             });
         });

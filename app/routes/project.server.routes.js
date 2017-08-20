@@ -1,37 +1,35 @@
 const projects = require('../controllers/project.server.controller');
-const bodyParser = require('body-parser');
-const jsonParser = bodyParser.json();
-const rawParser = bodyParser.raw({
-    limit: '10mb'
-});
+const multer = require('multer');
+const imagesFolder = multer({dest: "images/"});
 
 module.exports = function(app) {
     app.route('/projects')
-        .get(jsonParser, projects.viewAll);
+        .get(projects.viewAll);
 
     app.route('/projects', validateToken)
-        .post(jsonParser, projects.create); // Validate
+        .post(projects.create); // Validate
 
     app.route('/projects/:id')
-        .get(jsonParser, projects.viewOne);
+        .get(projects.viewOne);
 
     app.route('/projects/:id', validateToken)
-        .put(jsonParser, projects.update); // Validate
+        .put(projects.update); // Validate
 
     app.route('/projects/:id/image')
-        .get(jsonParser, projects.viewImage);
+        .get(projects.viewImage);
 
     app.route('/projects/:id/image')
-        .put(rawParser, projects.updateImage); // Validate
+        // .put(rawParser, projects.updateImage); // Validate
+        .put(imagesFolder.single('image'), projects.updateImage);
 
     app.route('/projects/:id/pledge', validateToken)
-        .post(jsonParser, projects.pledge); // Validate
+        .post(projects.pledge); // Validate
 
     app.route('/projects/:id/rewards')
-        .get(jsonParser, projects.viewRewards);
+        .get(projects.viewRewards);
 
     app.route('/projects/:id/rewards', validateToken)
-        .put(jsonParser, projects.updateRewards);
+        .put(projects.updateRewards);
 };
 
 const validateToken = (req, res, next) => {

@@ -1,25 +1,23 @@
 const users = require('../controllers/user.server.controller');
 const tokenValidate = require('../models/user.server.authentication');
-const bodyParser = require('body-parser');
-const jsonParser = bodyParser.json();
 
 module.exports = function(app) {
     app.route('/users')
-        .post(jsonParser, users.create)
-        .get(jsonParser, users.list);
+        .post(users.create)
+        .get(users.list);
 
     app.route('/users/login')
-        .post(jsonParser, users.login);
+        .post( users.login);
 
     app.route('/users/logout', validateToken)
-        .post(jsonParser, users.logout); // Validate
+        .post(users.logout); // Validate
 
     app.route('/users/:id')
-        .get(jsonParser, users.userById);
+        .get(users.userById);
 
     app.route('/users/:id', validateToken)
-        .put(jsonParser, users.update)  // Validate
-        .delete(jsonParser, users.delete);  // Validate
+        .put(users.update)  // Validate
+        .delete(users.delete);  // Validate
 };
 
 const validateToken = (req, res, next) => {

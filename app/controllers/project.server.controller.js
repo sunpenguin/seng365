@@ -1,4 +1,5 @@
 const Project = require('../models/project.server.model');
+const path = require('path');
 
 exports.viewAll = function(req, res) {
     let startIndex = req.get('startIndex');
@@ -86,7 +87,9 @@ exports.viewImage = function(req, res) {
                 res.status(result).send("Not found");
                 break;
             default:
-                res.status(200).send(result);
+                res.status(200);
+                res.setHeader('Content-Type', 'image/jpeg');
+                res.sendFile(path.resolve(result));
                 break;
         }
     });
@@ -94,8 +97,9 @@ exports.viewImage = function(req, res) {
 
 exports.updateImage = function(req, res) {
     let pid = req.params.id;
+    let filename = req.file.filename;
 
-    Project.newImage(pid, open, function(result) {
+    Project.newImage(pid, filename, function(result) {
         switch (result) {
             case 400:
                 res.status(result).send("Malformed request");

@@ -40,10 +40,10 @@ exports.create = function(req, res) {
     });
 };
 
-// TODO Check that these values are supposed to be in the header or body!
+// This is done in the header.
 exports.login = function(req, res) {
-    let username = req.body.username;
-    let password = req.body.password;
+    let username = req.get('username');
+    let password = req.get('password');
 
     User.login(username, password, function(result) {
         switch (result) {

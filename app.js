@@ -20,6 +20,9 @@ db.connect(function(err) {
     }
 });
 
-tables.createAndUseDatabase();
-tables.createTables();
-tables.createDependentTables();
+// tables.createAndUseDatabase();
+// tables.createTables();
+// tables.createDependentTables();
+
+tables.createAll()
+// tables.resetAll();
