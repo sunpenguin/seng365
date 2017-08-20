@@ -1,5 +1,7 @@
 /**
  * Creates necessary database and tables when missing.
+ *
+ * REFACTORING IN PROGRESS
  */
 
 const db = require('../config/db.js');
@@ -18,6 +20,7 @@ exports.createTables = function() {
 exports.createDependentTables = function() {
     createPledgeTable();
     createCreatorTable();
+    createImageTable();
 };
 
 function createCrowdfundingDatabase() {
@@ -138,6 +141,24 @@ function createCreatorTable() {
         ");";
 
     db.get().query(create, function(err, result) {
+        if (err) {
+            console.log(err);
+        }
+    });
+}
+
+function createImageTable() {
+    let image =
+        "CREATE TABLE IF NOT EXISTS Image" +
+        "{" +
+            "image_id    INT AUTO_INCREMENT," +
+            "proj_id     INT," +
+            "image   BLOB," +
+            "PRIMARY KEY (image_id)," +
+            "FOREIGN KEY (proj_id) REFERENCES Project(proj_id)" +
+        "};";
+
+    db.get().query(image, function(err, result) {
         if (err) {
             console.log(err);
         }

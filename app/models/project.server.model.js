@@ -176,6 +176,10 @@ exports.getImage = function(pid, done) {
     });
 };
 
+exports.newImage = function(pid, done) {
+    let sql = ""
+};
+
 exports.createPledge = function(pid, backerId, amount, anonymous, token, done) {
     if (isNaN(pid) || isNaN(backerId) || isNaN(amount)
         || typeof(anonymous) !== 'boolean' || typeof(token) !== 'string') {

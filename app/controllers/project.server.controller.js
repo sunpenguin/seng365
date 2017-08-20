@@ -92,8 +92,28 @@ exports.viewImage = function(req, res) {
     });
 };
 
-exports.updateImage = function() {
-    return null;
+exports.updateImage = function(req, res) {
+    let pid = req.params.id;
+
+    Project.newImage(pid, open, function(result) {
+        switch (result) {
+            case 400:
+                res.status(result).send("Malformed request");
+                break;
+            case 401:
+                res.status(result).send("Unauthorized - create account to update project");
+                break;
+            case 403:
+                res.status(result).send("Forbidden - unable to update a project you do not own");
+                break;
+            case 404:
+                res.status(result).send("Not found");
+                break;
+            default:
+                res.status(201).send(result);
+                break;
+        }
+    });
 };
 
 exports.pledge = function(req, res) {
