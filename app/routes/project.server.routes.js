@@ -1,36 +1,37 @@
-/**
- * Created by spe76 on 19/08/17.
- */
-
 const projects = require('../controllers/project.server.controller');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const rawParser = bodyParser.raw({
+    limit: '10mb'
+});
 
 module.exports = function(app) {
     app.route('/projects')
-        .get(projects.viewAll);
+        .get(jsonParser, projects.viewAll);
 
     app.route('/projects', validateToken)
-        .post(projects.create); // Validate
+        .post(jsonParser, projects.create); // Validate
 
     app.route('/projects/:id')
-        .get(projects.viewOne);
+        .get(jsonParser, projects.viewOne);
 
     app.route('/projects/:id', validateToken)
-        .put(projects.update); // Validate
+        .put(jsonParser, projects.update); // Validate
 
     app.route('/projects/:id/image')
-        .get(projects.viewImage);
+        .get(jsonParser, projects.viewImage);
 
     app.route('/projects/:id/image')
-        .put(projects.updateImage); // Validate
+        .put(rawParser, projects.updateImage); // Validate
 
     app.route('/projects/:id/pledge', validateToken)
-        .post(projects.pledge); // Validate
+        .post(jsonParser, projects.pledge); // Validate
 
     app.route('/projects/:id/rewards')
-        .get(projects.viewRewards);
+        .get(jsonParser, projects.viewRewards);
 
     app.route('/projects/:id/rewards', validateToken)
-        .put(projects.updateRewards);
+        .put(jsonParser, projects.updateRewards);
 };
 
 const validateToken = (req, res, next) => {

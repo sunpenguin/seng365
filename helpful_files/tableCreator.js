@@ -107,12 +107,13 @@ function createPledgeTable() {
     let pledge =
         "CREATE TABLE IF NOT EXISTS Pledge" +
         "(" +
+            "pledge_id   INT AUTO_INCREMENT," +
             "user_id INT," +
             "proj_id INT," +
             "amount  INT," +
             "anonymous   BOOLEAN," +
             "token   VARCHAR(20)," +
-            "PRIMARY KEY (user_id, proj_id)," +
+            "PRIMARY KEY (pledge_id)," +
             "FOREIGN KEY (user_id) REFERENCES User(user_id)," +
             "FOREIGN KEY (proj_id) REFERENCES Project(proj_id)" +
         ");";

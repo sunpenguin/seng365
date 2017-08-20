@@ -74,8 +74,22 @@ exports.update = function(req, res) {
     });
 };
 
-exports.viewImage = function() {
-    return null;
+exports.viewImage = function(req, res) {
+    let pid = req.params.id;
+
+    Project.getImage(pid, function(result) {
+        switch (result) {
+            case 400:
+                res.status(result).send("Malformed request");
+                break;
+            case 404:
+                res.status(result).send("Not found");
+                break;
+            default:
+                res.status(200).send(result);
+                break;
+        }
+    });
 };
 
 exports.updateImage = function() {

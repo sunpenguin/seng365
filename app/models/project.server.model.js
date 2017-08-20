@@ -137,17 +137,13 @@ exports.getOne = function(pid, done) {
                         let total = 0;
 
                         for (let i = 0; i < result.length; i++) {
-                            let name = result[i].user_id;
-                            if (result[i].anonymous === 1) {
-                                name = "anonymous";
+                            if (result[i].anonymous === 0) {
+                                details.backers.push({
+                                    "name": result[i].user_id,
+                                    "amount": result[i].amount,
+                                });
                             }
-
                             total += result[i].amount;
-
-                            details.backers.push({
-                                "name": name,
-                                "amount": result[i].amount,
-                            });
                         }
 
                         details.progress.currentPledged = total;
@@ -167,6 +163,16 @@ exports.update = function(pid, open, done) {
         if (err) return done(403);
 
         done("OK");
+    });
+};
+
+exports.getImage = function(pid, done) {
+    let sql = "SELECT image FROM Project WHERE proj_id = " + pid;
+
+    db.get().query(sql, function(err, result) {
+        if (err) return done(404);
+
+        done(result[0].image);
     });
 };
 
@@ -195,7 +201,7 @@ exports.createPledge = function(pid, backerId, amount, anonymous, token, done) {
                 let sqlCreatePledge = "INSERT INTO Pledge (user_id, proj_id, amount, anonymous, token) VALUES ?";
 
                 db.get().query(sqlCreatePledge, [pledgeDetails], function(err, result) {
-                    if (err) return done(404);
+                    if (err) return done(err);
                     // Increment number of backers!!!
                     done("OK");
                 });
@@ -215,8 +221,9 @@ exports.getRewards = function(pid, done) {
     });
 };
 
+// Removes all old rewards and puts in the new rewards
 exports.newRewards = function(pid, rewards, done) {
-    let sql = "DELETE FROM Reward WHERE proj_id = " + pid + " AND reward_id IN ?";
+    let sql = "DELETE FROM Reward WHERE proj_id = " + pid; // + " AND reward_id IN ?";
     let existing = [];
     for (let i = 0; i < rewards.length; i++) {
         existing.push(rewards[i].reward_id);
