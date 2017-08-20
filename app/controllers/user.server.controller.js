@@ -40,7 +40,6 @@ exports.create = function(req, res) {
     });
 };
 
-// This is done in the header.
 exports.login = function(req, res) {
     let username = req.get('username');
     let password = req.get('password');
