@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS User
 CREATE TABLE IF NOT EXISTS Project
 (
     proj_id     INT AUTO_INCREMENT,
-    creationDate   VARCHAR(20) NOT NULL,
+    creationDate   INT NOT NULL,
     title       VARCHAR(50) NOT NULL,
     subtitle    VARCHAR(50),
     description VARCHAR(200),

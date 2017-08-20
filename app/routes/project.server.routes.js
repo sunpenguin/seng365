@@ -23,7 +23,7 @@ module.exports = function(app) {
     app.route('/projects/:id/image')
         .put(projects.updateImage); // Validate
 
-    app.route('/projects/:id/pledge')
+    app.route('/projects/:id/pledge', validateToken)
         .post(projects.pledge); // Validate
 
     app.route('/projects/:id/rewards')

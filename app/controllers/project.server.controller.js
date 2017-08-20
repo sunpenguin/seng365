@@ -82,8 +82,35 @@ exports.updateImage = function() {
     return null;
 };
 
-exports.pledge = function() {
-    return null;
+exports.pledge = function(req, res) {
+    let pid = req.params.id;
+
+    let body = req. body;
+    let backerId = body.id;
+    let amount = body.amount;
+    let anonymous = body.anonymous;
+    // Is this just an authentication token being passed in? If so then we can store it in.
+    let token = body.card.authToken;
+
+    Project.createPledge(pid, backerId, amount, anonymous, token, function(result) {
+        switch (result) {
+            case 400:
+                res.status(result).send("Bad user, project, or pledge details");
+                break;
+            case 401:
+                res.status(result).send("Unauthorized - create account to pledge to a project");
+                break;
+            case 403:
+                res.status(result).send("Forbidden - cannot pledge to own project - this is fraud!");
+                break;
+            case 404:
+                res.status(result).send("Not found");
+                break;
+            default:
+                res.status(201).send(result);
+                break;
+        }
+    });
 };
 
 exports.viewRewards = function(req, res) {

@@ -1,8 +1,13 @@
 /**
- * Creates necessary tables when missing.
+ * Creates necessary database and tables when missing.
  */
 
 const db = require('../config/db.js');
+
+exports.createAndUseDatabase = function() {
+    createCrowdfundingDatabase();
+    useCrowdfundingDatabase();
+};
 
 exports.createTables = function() {
     createUserTable();
@@ -14,6 +19,26 @@ exports.createDependentTables = function() {
     createPledgeTable();
     createCreatorTable();
 };
+
+function createCrowdfundingDatabase() {
+    let crowdfunding = "CREATE DATABASE IF NOT EXISTS crowdfunding";
+
+    db.get().query(crowdfunding, function(err, result) {
+        if (err) {
+            console.log(err);
+        }
+    });
+}
+
+function useCrowdfundingDatabase() {
+    let useCrowdfunding = "USE crowdfunding";
+
+    db.get().query(useCrowdfunding, function(err, result) {
+        if (err) {
+            console.log(err);
+        }
+    });
+}
 
 function createUserTable() {
     let user =
