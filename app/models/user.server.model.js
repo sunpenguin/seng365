@@ -22,13 +22,12 @@ exports.getAll = function(done) {
  * @param done the function to return
  * @returns if ther are errors, return the error code, else return the first person found with that id
  */
-// TODO: Do I need to only get a single value or just leave it in a list format?
 exports.getOne = function(uid, done) {
     if (isNaN(uid)) {
         return done(400);
     }
 
-    let sql = "SELECT user_id, username, location, email FROM User WHERE user_id = " + uid
+    let sql = "SELECT user_id, username, location, email FROM User WHERE user_id = " + uid;
 
     db.get().query(sql, function (err, rows) {
 
@@ -54,7 +53,7 @@ exports.insert = function(username, location, email, password,  done) {
 
     db.get().query(sql, function(err, result) {
 
-        if (err) return done(400);
+        if (err || result.affectedRows === 0) return done(400);
 
         done(JSON.stringify(result.insertId));
     });
@@ -89,7 +88,7 @@ exports.login = function(username, password, done) {
 
     db.get().query(sql, function(err, result) {
 
-        if (err) return done(400);
+        if (err || JSON.stringify(result) === '[]') return done(400);
 
         let id = result[0].user_id;
 
@@ -111,37 +110,50 @@ exports.logout = function(token, done) {
 
 
 exports.alter = function(uid, username, location, email, password, done) {
-    let sql = "UPDATE User SET username = \'" + username + "\' , location = \'" + location + "\' , email = \'" +
-        email + "\', password = \'" + password + "\' WHERE user_id = " + uid;
+    let sqlForbidden = "SELECT * FROM User WHERE user_id = " + uid + " AND username = \'" + username + "\' AND password = \'" + password + "\'";
 
-    db.get().query(sql, function(err, result) {
+    db.get().query(sqlForbidden, function(err, result) {
 
-        if (err || result.affectedRows === 0) return done(404);
+        if (err || JSON.stringify(result) === '[]') return done(403);
 
-        // Give out correct result
-        done(result);
+        let sql = "UPDATE User SET username = \'" + username + "\' , location = \'" + location + "\' , email = \'" +
+            email + "\', password = \'" + password + "\' WHERE user_id = " + uid;
+
+        db.get().query(sql, function(err, result) {
+
+            if (err || result.affectedRows === 0) return done(404);
+
+            // Give out correct result
+            done(result);
+        });
     });
+
 };
 
 
-exports.remove = function(uid, token, done) {
-    // Check token value is not null. Return code 401 if null.
-
-
-    // Check token matches header. If no code 403.
-    let sql = "SELECT * FROM User WHERE authentication = \'" + token + "\'";
-
-    db.get().query(sql, function(err, result) {
-        if (err) return done(403);
-    });
-
-    sql = "UPDATE User SET active = false WHERE user_id = " + uid + "AND authentication = \'" + token + "\'";
+exports.remove = function(uid, done) {
+    let sql = "SELECT username, password FROM User WHERE user_id = " + uid;
 
     db.get().query(sql, function(err, result) {
 
-        if (err) return done(404);
+        if (err || JSON.stringify(result) === '[]') return done(err);
 
-        // Give out correct result
-        done(200);
+        let username = result[0].username;
+        let password = result[0].password;
+        let sqlForbidden = "SELECT * FROM User WHERE user_id = " + uid + " AND username = \'" + username + "\' AND password = \'" + password + "\'";
+
+        db.get().query(sqlForbidden, function(err, result) {
+
+            if (err || JSON.stringify(result) === '[]') return done(403);
+
+            let sql = "UPDATE User SET active = false WHERE user_id = " + uid;
+
+            db.get().query(sql, function(err, result) {
+
+                if (err) return done(err);
+
+                done(200);
+            });
+        });
     });
 };

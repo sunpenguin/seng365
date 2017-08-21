@@ -3,8 +3,8 @@ const middleware = require('../models/user.server.authentication');
 
 module.exports = function(app) {
     app.route('/users')
-        .post(users.create)
-        .get(users.list);
+        .post(users.create);
+        // .get(users.list);
 
     app.route('/users/login')
         .post( users.login);

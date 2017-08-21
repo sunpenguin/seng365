@@ -4,10 +4,6 @@ const express = require('express'),
 module.exports = function() {
     const app = express();
 
-    // app.use(bodyParser.urlencoded({
-    //     extended: true
-    // }));
-
     app.use(bodyParser.json());
 
     app.route('/').get(function(req,res) {

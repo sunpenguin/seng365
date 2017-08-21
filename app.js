@@ -20,9 +20,7 @@ db.connect(function(err) {
     }
 });
 
-// tables.createAndUseDatabase();
-// tables.createTables();
-// tables.createDependentTables();
-
-tables.createAll()
+// First time running, we can use resetAll, which drops the tables before creating.
+// createAll will work if the tables are correctly laid out.
+tables.createAll();
 // tables.resetAll();

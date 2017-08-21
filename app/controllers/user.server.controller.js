@@ -84,13 +84,7 @@ exports.userById = function(req, res) {
     User.getOne(uid, function(result) {
         switch (result) {
             case 400:
-                res.status(result).send("Malformed request");
-                break;
-            case 401:
-                res.status(result).send("Unauthorized - not logged in");
-                break;
-            case 403:
-                res.status(result).send("Forbidden - account not owned");
+                res.status(result).send("Invalid id supplied");
                 break;
             case 404:
                 res.status(result).send("User not found");
@@ -142,9 +136,8 @@ exports.update = function(req, res) {
  */
 exports.delete = function(req, res) {
     let uid = req.params.id;
-    let token = req.get('X-Authorization');
 
-    User.remove(uid, token, function(result) {
+    User.remove(uid, function(result) {
         switch (result) {
             case 401:
                 res.status(result).send("Unauthorized - not logged in");

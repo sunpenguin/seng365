@@ -8,16 +8,15 @@ exports.getAll = function(startIndex, count, done) {
     db.get().query(sql, function(err, result) {
         done(result);
     });
-
-
 };
 
 exports.createProject = function(title, subtitle, description, target, creators, rewards, done) {
-    let sql = "INSERT INTO Project (creationDate, title, subtitle, description, target) VALUES (\'" + parseInt(getToday())
-        + "\', \'" + title + "\', \'" + subtitle + "\', \'" + description + "\', " + parseInt(target) + ")";
+    let sql = "INSERT INTO Project (creationDate, title, subtitle, description, target) VALUES (" + parseInt(getToday())
+        + ", \'" + title + "\', \'" + subtitle + "\', \'" + description + "\', " + parseInt(target) + ")";
 
     db.get().query(sql, function(err, result) {
-        if (err) return done(err);
+
+        if (err) return done(400);
 
         let proj_id = result.insertId;
 
@@ -129,7 +128,7 @@ exports.getOne = function(pid, done) {
                     let sqlBackers = "SELECT user_id, amount, anonymous FROM Pledge WHERE proj_id = " + pid;
                     // Get the backer information
                     db.get().query(sqlBackers, function(err, result) {
-                        if (err) return done(err);
+                        if (err) return done(404);
 
                         let total = 0;
 
@@ -154,12 +153,27 @@ exports.getOne = function(pid, done) {
 };
 
 exports.update = function(pid, open, done) {
-    let sql = "UPDATE Project SET open = " + open + " WHERE proj_id = " + pid;
+    let sqlVerifyProjectDetails = "SELECT * FROM Project WHERE proj_id = " + pid;
 
-    db.get().query(sql, function(err, result) {
-        if (err) return done(403);
+    db.get().query(sqlVerifyProjectDetails, function(err, result) {
 
-        done("OK");
+        if (err || JSON.stringify(result) === "[]") return done(404);
+
+        let sql = "SELECT user_id FROM Creator WHERE proj_id = " + pid;
+
+        db.get().query(sql, function(err, result) {
+
+            if (err || JSON.stringify(result) === "[]") return done(403);
+
+            sql = "UPDATE Project SET open = " + open + " WHERE proj_id = " + pid;
+
+            db.get().query(sql, function(err, result) {
+
+                if (err) return done(400);
+
+                done("OK");
+            });
+        });
     });
 };
 
@@ -170,7 +184,6 @@ exports.getImage = function(pid, done) {
     db.get().query(sql, function(err, result) {
 
         let path = result[0].image;
-        // console.log(path);
 
         if (fs.existsSync(path)) {
             done(path);
@@ -181,13 +194,20 @@ exports.getImage = function(pid, done) {
 };
 
 exports.newImage = function(pid, filename, done) {
-    // console.log(blob.toString());
-    let sql = "UPDATE Project SET image = \'images/" + filename + "\' WHERE proj_id = " + pid;
+    let sql = "SELECT user_id FROM Creator WHERE proj_id = " + pid;
 
     db.get().query(sql, function(err, result) {
-        if (err) return done(err);
 
-        done("OK");
+        if (err || JSON.stringify(result) === "[]") return done(403);
+
+        let sql = "UPDATE Project SET image = \'images/" + filename + "\' WHERE proj_id = " + pid;
+
+        db.get().query(sql, function (err, result) {
+
+            if (err) return done(400);
+
+            done("OK");
+        });
     });
 };
 
@@ -197,32 +217,28 @@ exports.createPledge = function(pid, backerId, amount, anonymous, token, done) {
         return done(400);
     }
 
-    let sqlVerifyUserDetails = "SELECT * FROM User WHERE user_id = " + backerId;
+    let sqlVerifyProjectDetails = "SELECT * FROM Project WHERE proj_id = " + pid;
 
-    // This needs to be checked by middleware somehow.
-    db.get().query(sqlVerifyUserDetails, function(err, result) {
-        if (err || JSON.stringify(result) === "[]") return done(401);
+    db.get().query(sqlVerifyProjectDetails, function(err, result) {
 
-        let sqlVerifyProjectDetails = "SELECT * FROM Project WHERE proj_id = " + pid;
+        if (err || JSON.stringify(result) === "[]") return done(404);
 
-        db.get().query(sqlVerifyProjectDetails, function(err, result) {
-            if (err || JSON.stringify(result) === "[]") return done(404);
+        let sqlVerifyNotSelf = "SELECT user_id FROM Creator WHERE proj_id = " + pid + " AND user_id = " + backerId;
 
-            let sqlVerifyNotSelf = "SELECT user_id FROM Creator WHERE proj_id = " + pid + " AND user_id = " + backerId;
+        db.get().query(sqlVerifyNotSelf, function(err, result) {
 
-            db.get().query(sqlVerifyNotSelf, function(err, result) {
-                if (err || JSON.stringify(result) !== "[]") return done(403);
-                let pledgeDetails = [[backerId, pid, amount, anonymous, token]];
-                let sqlCreatePledge = "INSERT INTO Pledge (user_id, proj_id, amount, anonymous, token) VALUES ?";
+            if (err || JSON.stringify(result) !== "[]") return done(403);
 
-                db.get().query(sqlCreatePledge, [pledgeDetails], function(err, result) {
-                    if (err) return done(err);
-                    // Increment number of backers!!!
-                    let sqlBackers = "UPDATE Project SET number_of_backers = number_of_backers + 1 WHERE proj_id = " + pid;
+            let pledgeDetails = [[backerId, pid, amount, anonymous, token]];
+            let sqlCreatePledge = "INSERT INTO Pledge (user_id, proj_id, amount, anonymous, token) VALUES ?";
 
-                    db.get().query(sqlBackers, function(err, result) {
-                        done("OK");
-                    });
+            db.get().query(sqlCreatePledge, [pledgeDetails], function(err, result) {
+                if (err) return done(err);
+                // Increment number of backers!!!
+                let sqlBackers = "UPDATE Project SET number_of_backers = number_of_backers + 1 WHERE proj_id = " + pid;
+
+                db.get().query(sqlBackers, function(err, result) {
+                    done("OK");
                 });
             });
         });
@@ -240,30 +256,44 @@ exports.getRewards = function(pid, done) {
     });
 };
 
-// Removes all old rewards and puts in the new rewards
+
 exports.newRewards = function(pid, rewards, done) {
-    let sql = "DELETE FROM Reward WHERE proj_id = " + pid; // + " AND reward_id IN ?";
-    let existing = [];
-    for (let i = 0; i < rewards.length; i++) {
-        existing.push(rewards[i].reward_id);
-    }
+    let sql = "SELECT * FROM Project WHERE proj_id = " + pid;
 
-    db.get().query(sql, [[existing]], function(err, result) {
-        if (err) return done(err);
+    db.get().query(sql, function(err, result) {
 
-        // Check for error 403 by checking the creators of the project.
+        if (err || JSON.stringify(result) === "[]") return done(404);
 
-        let sqlNewRewards = "INSERT INTO Reward (reward_id, proj_id, amount, description) VALUES ?";
+        sql = "SELECT user_id FROM Creator WHERE proj_id = " + pid;
 
-        let newData = [];
-        for (let i = 0; i < rewards.length; i++) {
-            newData.push([rewards[i].id, pid, rewards[i].amount, rewards[i].description]);
-        }
+        db.get().query(sql, function(err, result) {
 
-        db.get().query(sqlNewRewards, [newData], function(err, result) {
-            if (err) return done(err);
+            if (err || JSON.stringify(result) === "[]") return done(403);
 
-            done("OK");
+            sql = "DELETE FROM Reward WHERE proj_id = " + pid;
+            let existing = [];
+            for (let i = 0; i < rewards.length; i++) {
+                existing.push(rewards[i].reward_id);
+            }
+
+            db.get().query(sql, [[existing]], function(err, result) {
+
+                if (err) return done(400);
+
+                let sqlNewRewards = "INSERT INTO Reward (reward_id, proj_id, amount, description) VALUES ?";
+
+                let newData = [];
+                for (let i = 0; i < rewards.length; i++) {
+                    newData.push([rewards[i].id, pid, rewards[i].amount, rewards[i].description]);
+                }
+
+                db.get().query(sqlNewRewards, [newData], function(err, result) {
+
+                    if (err) return done(400);
+
+                    done("OK");
+                });
+            });
         });
     });
 };
