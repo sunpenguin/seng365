@@ -1,18 +1,28 @@
-import Vue from 'vue';
-import App from './App.vue';
-import Home from './Home.vue';
-import Users from './Users.vue';
+import Vue from 'vue'
+import App from './App.vue'
+import Home from './Home.vue'
+import Users from './Users.vue'
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
+// Vue.http.options.emulateJSON = true;
+
+import VueResource from 'vue-resource';
+Vue.use(VueResource);
 
 const routes = [
     {
-        PATH: "/",
+        path: "/",
         component: Home
     },
     {
+        path: "/users/:userId",
+        name: "user",
+        component: Users
+    },
+    {
         path: "/users",
+        name: "users",
         component: Users
     }
 ];
