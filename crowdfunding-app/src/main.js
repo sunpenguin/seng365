@@ -13,6 +13,12 @@ Vue.use(VueResource);
 const routes = [
     {
         path: "/",
+        name: "projects",
+        component: Home
+    },
+    {
+        path: "/:id",
+        name: "project",
         component: Home
     },
     {

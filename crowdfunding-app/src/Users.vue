@@ -53,6 +53,7 @@
                 </div>
             </div>
         </div>
+
         <div v-else>
             <div id="users">
                 <table>
@@ -95,25 +96,25 @@
                         return this.users[i];
                     }
                 }
-            }
-        },
-        deleteUser: function(user) {
-            this.$http.delete('http://localhost:9091/api/users/' + user.user_id)
-                .then(function(response) {
-                    let tempid = user.user_id;
+            },
+            deleteUser: function(user) {
+                this.$http.delete('http://localhost:9091/api/users/' + user.user_id)
+                    .then(function(response) {
+                        let tempid = user.user_id;
 
-                    for (let i = 0; i <= this.users.length; i++) {
-                        if (tempid === this.users[i].user_id) {
-                            this.users.splice(i, 1);
+                        for (let i = 0; i <= this.users.length; i++) {
+                            if (tempid === this.users[i].user_id) {
+                                this.users.splice(i, 1);
+                            }
                         }
-                    }
 
-                    this.$router.push('/users');
+                        this.$router.push('/users');
 
-                }, function(error) {
-                    this.error = error;
-                    this.errorFlag = true;
-                });
+                    }, function(error) {
+                        this.error = error;
+                        this.errorFlag = true;
+                    });
+            }
         }
     }
 </script>
