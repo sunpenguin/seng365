@@ -5,10 +5,13 @@
             {{ error }}
         </div>
 
-        <div id="projects">
+        <div id="projectsTable">
             <table>
                 <tr v-for="project in projects">
-                    <td> {{ project.imageUri }} </td>
+
+                    <td>
+                        <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
+                    </td>
                     <td> {{ project.title }} </td>
                     <td> {{ project.subtitle }} </td>
                     <td><router-link :to="{ name: 'project', params: { project_id: project.id }}">View</router-link></td>
@@ -24,22 +27,23 @@
             return {
                 error: "",
                 errorFlag: false,
-                projects: []
+                projects: [],
+                images: []
             }
         },
-        mounted: function() {
+        mounted: function () {
             this.getProjects();
         },
         methods: {
-            getProjects: function() {
+            getProjects: function () {
                 this.$http.get("http://localhost:4941/api/v2/projects")
-                    .then(function(response) {
+                    .then(function (response) {
                         this.projects = response.data;
-                        <!-- This is for duplicating data to check how large amounts of projects look. -->
+
                         for (let i = 1; i < 16; i++) {
                             this.projects.push(this.projects[0]);
                         }
-                    }, function(error) {
+                    }, function (error) {
                         this.error = error;
                         this.errorFlag = true;
                     });
