@@ -5,18 +5,30 @@
             {{ error }}
         </div>
 
-        <div id="projectsTable">
-            <table>
-                <tr v-for="project in projects">
+        <div v-if="$route.params.projectId">
+            <div id="project">
+                <router-link :to="{ name: 'projects' }">Back to all Projects</router-link>
+                <br /><br />
+                <table>
+                    <tr>
+                        <td>{{ $route.params.projectId }}</td>
+                        <td>{{ getSingleProject($route.params.projectId).title }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
 
-                    <td>
+        <div v-else>
+            <div id="projectsList">
+                <ul>
+                    <li class="projectSummary" v-for="project in projects">
                         <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
-                    </td>
-                    <td> {{ project.title }} </td>
-                    <td> {{ project.subtitle }} </td>
-                    <td><router-link :to="{ name: 'project', params: { project_id: project.id }}">View</router-link></td>
-                </tr>
-            </table>
+                        <p>{{ project.title }}</p>
+                        <p>{{ project.subtitle }}</p>
+                        <p><router-link :to="{ name: 'project', params: { projectId: project.id }}">View Details</router-link></p>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </template>
@@ -27,26 +39,32 @@
             return {
                 error: "",
                 errorFlag: false,
-                projects: [],
-                images: []
+                projects: []
             }
         },
-        mounted: function () {
+        mounted: function (){
             this.getProjects();
         },
         methods: {
-            getProjects: function () {
+            getProjects: function(){
                 this.$http.get("http://localhost:4941/api/v2/projects")
                     .then(function (response) {
                         this.projects = response.data;
 
-                        for (let i = 1; i < 16; i++) {
+                        for (let i = 1; i < 5; i++) {
                             this.projects.push(this.projects[0]);
                         }
                     }, function (error) {
                         this.error = error;
                         this.errorFlag = true;
                     });
+            },
+            getSingleProject: function(id){
+                for(let i = 0; i <= this.projects.length; i++){
+                    if(this.projects[i].id === id){
+                        return this.projects[i];
+                    }
+                }
             }
         }
     }

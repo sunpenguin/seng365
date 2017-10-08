@@ -1,0 +1,16 @@
+.projectSummary {
+    text-align: justify;
+    width: 400px;
+}
+
+.projectSummary img {
+    height: 300px;
+    width: 400px;
+    overflow: hidden;
+    display: block;
+    margin: 0 auto;
+}
+
+.projectSummary p {
+    line-height: 10px;
+}
