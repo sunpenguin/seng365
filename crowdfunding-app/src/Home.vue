@@ -13,6 +13,7 @@
                     <tr>
                         <td>{{ $route.params.projectId }}</td>
                         <td>{{ getSingleProject($route.params.projectId).title }}</td>
+                        <td>{{ singleProject }}</td>
                     </tr>
                 </table>
             </div>
@@ -23,13 +24,14 @@
                 <ul>
                     <li class="projectSummary" v-for="project in projects">
                         <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
-                        <p>{{ project.title }}</p>
+                        <h4>{{ project.title }}</h4>
                         <p>{{ project.subtitle }}</p>
-                        <p><router-link :to="{ name: 'project', params: { projectId: project.id }}">View Details</router-link></p>
+                        <router-link @click.native="getSingleProjectDetails(project.id)" :to="{ name: 'project', params: { projectId: project.id }}">View Details</router-link>
                     </li>
                 </ul>
             </div>
         </div>
+        <router-link :to="{ name: 'users' }">Users</router-link>
     </div>
 </template>
 
@@ -39,7 +41,9 @@
             return {
                 error: "",
                 errorFlag: false,
-                projects: []
+                projects: [],
+                singleProject: "",
+                number: 0
             }
         },
         mounted: function (){
@@ -50,10 +54,6 @@
                 this.$http.get("http://localhost:4941/api/v2/projects")
                     .then(function (response) {
                         this.projects = response.data;
-
-                        for (let i = 1; i < 5; i++) {
-                            this.projects.push(this.projects[0]);
-                        }
                     }, function (error) {
                         this.error = error;
                         this.errorFlag = true;
@@ -65,6 +65,15 @@
                         return this.projects[i];
                     }
                 }
+            },
+            getSingleProjectDetails: function(id){
+                this.$http.get("http://localhost:4941/api/v2/projects/" + id)
+                    .then(function (response) {
+                        this.singleProject = response.data;
+                    }, function (error) {
+                        this.error = error;
+                        this.errorFlag = true;
+                    });
             }
         }
     }
