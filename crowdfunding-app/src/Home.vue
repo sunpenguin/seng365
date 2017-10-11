@@ -5,6 +5,8 @@
             {{ error }}
         </div>
 
+        <br />
+        <router-link :to="{ name: 'users' }">Users</router-link>
         <div v-if="$route.params.projectId">
             <div id="project">
                 <router-link :to="{ name: 'projects' }">Back to all Projects</router-link>
@@ -20,9 +22,11 @@
         </div>
 
         <div v-else>
+            <br />
+            <input type="search" v-model="searchString" placeholder="Search Projects" />
             <div id="projectsList">
                 <ul>
-                    <li class="projectSummary" v-for="project in projects">
+                    <li class="projectSummary" v-for="project in searchProjects">
                         <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
                         <h4>{{ project.title }}</h4>
                         <p>{{ project.subtitle }}</p>
@@ -31,7 +35,6 @@
                 </ul>
             </div>
         </div>
-        <router-link :to="{ name: 'users' }">Users</router-link>
     </div>
 </template>
 
@@ -39,11 +42,12 @@
     export default {
         data() {
             return {
+                searchString: "",
                 error: "",
                 errorFlag: false,
                 projects: [],
                 singleProject: "",
-                number: 0
+                number: 5
             }
         },
         mounted: function (){
@@ -51,9 +55,10 @@
         },
         methods: {
             getProjects: function(){
-                this.$http.get("http://localhost:4941/api/v2/projects")
+                this.$http.get("http://localhost:4941/api/v2/projects", {params: {open: true}})
                     .then(function (response) {
                         this.projects = response.data;
+                        this.filteredProjects = response.data;
                     }, function (error) {
                         this.error = error;
                         this.errorFlag = true;
@@ -74,6 +79,28 @@
                         this.error = error;
                         this.errorFlag = true;
                     });
+            }
+        },
+        computed: {
+            searchProjects: function(){
+                let projects = this.projects,
+                   searchString  = this.searchString;
+
+                if (!searchString) {
+                    return projects;
+                }
+
+                this.number+=1;
+
+                searchString = searchString.trim().toLowerCase();
+
+                projects = projects.filter(function(item){
+                    if(item.title.toLowerCase().indexOf(searchString) !== -1){
+                        return item;
+                    }
+                });
+
+                return projects;
             }
         }
     }
