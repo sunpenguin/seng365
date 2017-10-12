@@ -8,6 +8,14 @@
         <br />
         <router-link :to="{ name: 'users' }">Users</router-link>
 
+        <div v-if="authToken">
+            Yes
+        </div>
+        <div v-else>
+            No
+            <router-link :to="{ name: 'createUser' }">Create User</router-link>
+        </div>
+
         <div v-if="$route.params.projectId">
             <div id="project">
                 <router-link :to="{ name: 'projects' }">Back to all Projects</router-link>
@@ -37,10 +45,15 @@
                 <br />
                 Rewards:
                 <p v-for="reward in getRewards()">
-                    {{ reward.amount }}
-                    {{ reward.description }}
+                    ${{ reward.amount / 100 }}
+                    : {{ reward.description }}
                 </p>
 
+                <!--Include Recent Pledges and Anonymous Pledges-->
+                <br />
+                Progress
+                <p>Total Pledged: {{ singleProject.progress.currentPledged }}</p>
+                <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
             </div>
         </div>
 
@@ -70,7 +83,7 @@
                 errorFlag: false,
                 projects: [],
                 singleProject: "",
-                number: 5
+                authToken: ""
             }
         },
         mounted: function (){
@@ -111,6 +124,9 @@
             getDate: function(){
                 let date = new Date(this.singleProject.creationDate);
                 return date.toLocaleDateString();
+            },
+            loggedIn: function(){
+                return this.authToken;
             }
         },
         computed: {

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import Home from './Home.vue'
 import Users from './Users.vue'
+import CreateUser from './CreateUser.vue'
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
@@ -25,6 +26,11 @@ const routes = [
         path: "/users",
         name: "users",
         component: Users
+    },
+    {
+        path: "/createUser",
+        name: "createUser",
+        component: CreateUser
     }
 ];
 
