@@ -4,14 +4,14 @@
             {{ error }}
         </div>
 
-            <div id="user">
-                <router-link :to="{ name: 'projects' }">Home</router-link>
+        <div id="user">
+            <router-link :to="{ name: 'projects' }">Back to Projects</router-link>
 
-                <br /><br />
+            <br /><br />
 
-                <p>AND HIS NAME IS...</p>
-                <h1>JOHN CENA!</h1>
-            </div>
+            <p>AND HIS NAME IS...</p>
+            <h1>JOHN CENA!</h1>
+        </div>
     </div>
 </template>
 

@@ -7,17 +7,40 @@
 
         <br />
         <router-link :to="{ name: 'users' }">Users</router-link>
+
         <div v-if="$route.params.projectId">
             <div id="project">
                 <router-link :to="{ name: 'projects' }">Back to all Projects</router-link>
                 <br /><br />
-                <table>
-                    <tr>
-                        <td>{{ $route.params.projectId }}</td>
-                        <td>{{ getSingleProject($route.params.projectId).title }}</td>
-                        <td>{{ singleProject }}</td>
-                    </tr>
-                </table>
+                <h2>{{ singleProject.title }}</h2>
+                <h4>{{ singleProject.subtitle }}</h4>
+                <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
+
+                <br />
+                Project created on:
+                <p>{{ getDate() }}</p>
+
+                <br />
+                Description:
+                <p>{{ singleProject.description }}</p>
+
+                <br />
+                Target:
+                <p>{{ singleProject.target }}</p>
+
+                <br />
+                Creator(s):
+                <p v-for="creator in getCreators()">
+                    {{ creator.username }}
+                </p>
+
+                <br />
+                Rewards:
+                <p v-for="reward in getRewards()">
+                    {{ reward.amount }}
+                    {{ reward.description }}
+                </p>
+
             </div>
         </div>
 
@@ -58,7 +81,6 @@
                 this.$http.get("http://localhost:4941/api/v2/projects", {params: {open: true}})
                     .then(function (response) {
                         this.projects = response.data;
-                        this.filteredProjects = response.data;
                     }, function (error) {
                         this.error = error;
                         this.errorFlag = true;
@@ -79,6 +101,16 @@
                         this.error = error;
                         this.errorFlag = true;
                     });
+            },
+            getCreators: function(){
+                return this.singleProject.creators;
+            },
+            getRewards: function(){
+                return this.singleProject.rewards;
+            },
+            getDate: function(){
+                let date = new Date(this.singleProject.creationDate);
+                return date.toLocaleDateString();
             }
         },
         computed: {
