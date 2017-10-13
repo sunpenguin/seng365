@@ -1,19 +1,27 @@
 <template>
     <div>
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <router-link class="navbar-brand" :to="{ name: 'projects' }">Crowdfunding Website</router-link>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><router-link :to="{ name: 'projects' }">Projects</router-link></li>
+                    <li><router-link :to="{ name: 'user' }">User</router-link></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
+                    <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-log-in"></span> Login</router-link></li>
+                </ul>
+            </div>
+        </nav>
         Home Page
         <div v-if="errorFlag" style="color: red;">
             {{ error }}
         </div>
 
-        <br />
-        <router-link :to="{ name: 'users' }">Users</router-link>
-
         <div v-if="authToken">
             Yes
-        </div>
-        <div v-else>
-            No
-            <router-link :to="{ name: 'createUser' }">Create User</router-link>
         </div>
 
         <div v-if="$route.params.projectId">
@@ -60,6 +68,7 @@
         <div v-else>
             <br />
             <input type="search" v-model="searchString" placeholder="Search Projects" />
+            <br /><br />
             <div id="projectsList">
                 <ul>
                     <li class="projectSummary" v-for="project in searchProjects">

@@ -1,12 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
 import Home from './Home.vue'
-import Users from './Users.vue'
+import User from './User.vue'
 import CreateUser from './CreateUser.vue'
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
-// Vue.http.options.emulateJSON = true;
 
 import VueResource from 'vue-resource';
 Vue.use(VueResource);
@@ -23,9 +22,9 @@ const routes = [
         component: Home
     },
     {
-        path: "/users",
-        name: "users",
-        component: Users
+        path: "/user",
+        name: "user",
+        component: User
     },
     {
         path: "/createUser",

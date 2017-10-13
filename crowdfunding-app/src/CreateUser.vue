@@ -1,26 +1,33 @@
 <template>
     <div>
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <router-link class="navbar-brand" :to="{ name: 'projects' }">Crowdfunding Website</router-link>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li><router-link :to="{ name: 'projects' }">Projects</router-link></li>
+                    <li><router-link :to="{ name: 'user' }">User</router-link></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
+                    <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-log-in"></span> Login</router-link></li>
+                </ul>
+            </div>
+        </nav>
         <div v-if="errorFlag" style="color: red;">
             {{ error }}
         </div>
 
-        <router-link :to="{ name: 'projects' }">Cancel</router-link>
-
         <div id="newUserForm">
-            <p>AND HIS NAME IS...</p>
-            <h1>JOHN CENA!</h1>
             <br />
-            <input type="text" v-model="newUsername" placeholder="Username">
-            {{ username }}
+            Username <input type="text" v-model="newUsername" placeholder="Username">
             <br />
-            <input type="password" v-model="newPassword" placeholder="Password">
-            {{ password }}
+            Password <input type="password" v-model="newPassword" placeholder="Password">
             <br />
-            <input type="email" v-model="newEmail" placeholder="Email Address">
-            {{ email }}
+            E-mail <input type="email" v-model="newEmail" placeholder="Email Address">
             <br />
-            <input type="text" v-model="newLocation" placeholder="(optional)">
-            {{ location }}
+            Location <input type="text" v-model="newLocation" placeholder="(optional)">
             <br />
             <button @click="createNewUser()">Create New Account</button>
             <button @click="logIn()">Log In</button>
@@ -91,6 +98,7 @@
                     });
             },
             logIn: function(){
+                this.errorFlag = false;
                 this.$http.post("http://localhost:4941/api/v2/users/login", {}, {
                     params: {
                         username: this.newUsername,
