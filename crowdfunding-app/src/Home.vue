@@ -15,7 +15,6 @@
                 </ul>
             </div>
         </nav>
-        Home Page
         <div v-if="errorFlag" style="color: red;">
             {{ error }}
         </div>
@@ -26,7 +25,6 @@
 
         <div v-if="$route.params.projectId">
             <div id="project">
-                <router-link :to="{ name: 'projects' }">Back to all Projects</router-link>
                 <br /><br />
                 <h2>{{ singleProject.title }}</h2>
                 <h4>{{ singleProject.subtitle }}</h4>
@@ -66,8 +64,7 @@
         </div>
 
         <div v-else>
-            <br />
-            <input type="search" v-model="searchString" placeholder="Search Projects" />
+            Search Projects <input type="search" v-model="searchString" placeholder="Search Projects" />
             <br /><br />
             <div id="projectsList">
                 <ul>
