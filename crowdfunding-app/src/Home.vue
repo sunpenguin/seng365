@@ -7,21 +7,41 @@
                 </div>
                 <ul class="nav navbar-nav">
                     <li class="active"><router-link :to="{ name: 'projects' }">Projects</router-link></li>
-                    <li><router-link :to="{ name: 'user' }">User</router-link></li>
                 </ul>
-                    <div v-if="this.$store.state.authenticationToken">
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><router-link :to="{ name: 'userDetails' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
-                            <li><router-link :to="{ name: 'logIn' }"><span class="glyphicon glyphicon-log-in"></span> Log Out</router-link></li>
-                        </ul>
-                    </div>
+                <div v-if="this.$store.state.authenticationToken">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
+                        <li><router-link :to="{ name: 'myProjects' }"><span class="glyphicon glyphicon-edit"></span> Manage My Projects</router-link></li>
+                        <li><router-link @click.native="logOut()" :to="{ name: 'projects'}"><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
+                    </ul>
+                </div>
 
-                    <div v-else>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
-                            <li><router-link :to="{ name: 'logIn' }"><span class="glyphicon glyphicon-log-in"></span> Login</router-link></li>
-                        </ul>
-                    </div>
+                <div v-else>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
+
+                        <li class="dropdown">
+                            <router-link :to="{ name: 'projects' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <div class="form-group">
+                                        <label for="usernameEmail">Username or Email</label>
+                                        <input type="text" class="form-control" id="usernameEmail" v-model="cUsername" placeholder="Username/Email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password">Password</label>
+                                        <input type="password" class="form-control" id="password" v-model="cPassword" placeholder="Password">
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
             </div>
         </nav>
 
@@ -29,66 +49,20 @@
             {{ error }}
         </div>
 
-        <div v-if="authToken">
-            Yes
-        </div>
-
-        <div v-if="$route.params.projectId">
-            <div id="project">
-                <br /><br />
-                <h2>{{ singleProject.title }}</h2>
-                <h4>{{ singleProject.subtitle }}</h4>
-                <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
-
-                <br />
-                Project created on:
-                <p>{{ getDate() }}</p>
-
-                <br />
-                Description:
-                <p>{{ singleProject.description }}</p>
-
-                <br />
-                Target:
-                <p>{{ singleProject.target }}</p>
-
-                <br />
-                Creator(s):
-                <p v-for="creator in getCreators()">
-                    {{ creator.username }}
-                </p>
-
-                <br />
-                Rewards:
-                <p v-for="reward in getRewards()">
-                    ${{ reward.amount / 100 }}
-                    : {{ reward.description }}
-                </p>
-
-                <!--Include Recent Pledges and Anonymous Pledges-->
-                <br />
-                Progress
-                <p>Total Pledged: {{ singleProject.progress.currentPledged }}</p>
-                <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
-            </div>
-        </div>
-
-        <div v-else>
-            Search Projects <input type="search" v-model="searchString" placeholder="Search Projects" />
-            <br /><br />
-            <div id="projectsList" v-cloak>
-                <ul>
-                    <li class="projectSummary" v-for="project in searchProjects">
-                        <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
-                        <h4>{{ project.title }}</h4>
-                        <p>{{ project.subtitle }}</p>
-                        <router-link @click.native="getSingleProjectDetails(project.id)" :to="{ name: 'project', params: { projectId: project.id }}">View Details</router-link>
-                    </li>
-                </ul>
-                <br />
-                <p>{{ $store.state.authenticationToken }}</p>
-                <p>Counter: {{ counter }}, Range: {{ sRange }}, AuthToken: {{ projects.length }}, {{ counter2 }}</p>
-            </div>
+        Search Projects <input type="search" v-model="searchString" placeholder="Search Projects" />
+        <br /><br />
+        <div id="projectsList" v-cloak>
+            <ul>
+                <li class="projectSummary" v-for="project in searchProjects">
+                    <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
+                    <h4>{{ project.title }}</h4>
+                    <p>{{ project.subtitle }}</p>
+                    <router-link :to="{ name: 'project', params: { projectId: project.id }}">View Details</router-link>
+                </li>
+            </ul>
+            <br />
+            <p>{{ $store.state.authenticationToken }}</p>
+            <p>Counter: {{ counter }}, Range: {{ sRange }}, AuthToken: {{ projects.length }}, {{ counter2 }}</p>
         </div>
     </div>
 </template>
@@ -101,11 +75,12 @@
                 error: "",
                 errorFlag: false,
                 projects: [],
-                singleProject: "",
                 authToken: "",
                 sRange: 1,
                 counter: 0,
-                counter2: 0
+                counter2: 0,
+                cUsername: "",
+                cPassword: ""
             }
         },
         mounted: function (){
@@ -121,35 +96,6 @@
                         this.errorFlag = true;
                     });
             },
-            getSingleProject: function(id){
-                for(let i = 0; i <= this.projects.length; i++){
-                    if(this.projects[i].id === id){
-                        return this.projects[i];
-                    }
-                }
-            },
-            getSingleProjectDetails: function(id){
-                this.$http.get("http://localhost:4941/api/v2/projects/" + id)
-                    .then(function (response) {
-                        this.singleProject = response.data;
-                    }, function (error) {
-                        this.error = error;
-                        this.errorFlag = true;
-                    });
-            },
-            getCreators: function(){
-                return this.singleProject.creators;
-            },
-            getRewards: function(){
-                return this.singleProject.rewards;
-            },
-            getDate: function(){
-                let date = new Date(this.singleProject.creationDate);
-                return date.toLocaleDateString();
-            },
-            loggedIn: function(){
-                return this.authToken;
-            },
             hasSpace: function(){
                 this.counter += 1;
                 if (this.counter < this.counter2) {
@@ -157,6 +103,38 @@
                 }
                 this.counter -= 1;
                 return false;
+            },
+            logIn: function(){
+                this.errorFlag = false;
+                this.$http.post("http://localhost:4941/api/v2/users/login", {}, {
+                    params: {
+                        username: this.cUsername,
+                        email: this.cUsername,
+                        password: this.cPassword
+                    }
+                }).then(function(response){
+                    this.$store.commit('changeId', response.data.id);
+                    this.$store.commit('changeToken', response.data.token);
+                    this.cUsername = "";
+                    this.cPassword = "";
+                }, function(error) {
+                    this.error = "Error Logging In!";
+                    this.errorFlag = true;
+                });
+            },
+            logOut: function() {
+                this.errorFlag = false;
+                this.$http.post("http://localhost:4941/api/v2/users/logout", {}, {
+                    headers: {
+                        'X-Authorization': this.$store.state.authenticationToken
+                    }
+                }).then(function(response){
+                    this.$store.commit('changeId', -1);
+                    this.$store.commit('changeToken', "");
+                }, function(error) {
+                    this.error = "Error Logging Out!";
+                    this.errorFlag = true;
+                });
             }
         },
         computed: {

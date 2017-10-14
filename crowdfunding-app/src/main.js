@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import App from './App.vue'
 import Home from './Home.vue'
+import Project from './Project.vue'
 import User from './User.vue'
 import CreateUser from './CreateUser.vue'
-import LogIn from './LogIn.vue'
-import UserDetails from './UserDetails.vue'
+import UserProjects from './UserProjects.vue'
+import CreateProject from './CreateProject.vue'
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
@@ -24,7 +25,7 @@ const routes = [
     {
         path: "/:projectId",
         name: "project",
-        component: Home
+        component: Project
     },
     {
         path: "/user",
@@ -37,20 +38,26 @@ const routes = [
         component: CreateUser
     },
     {
-        path: "/logIn",
-        name: "logIn",
-        component: LogIn
+        path: "/myProjects",
+        name: "myProjects",
+        components: UserProjects
     },
     {
-        path: "/userDetails",
-        name: "userDetails,",
-        component: UserDetails
+        path: "/createProject",
+        name: "createProject",
+        component: CreateProject
     }
 ];
 
 const router = new VueRouter({
     routes: routes,
-    mode: 'history'
+    mode: 'history',
+    go: {
+        path: "/",
+        name: "projects",
+        component: Home,
+        force: true
+    }
 });
 
 const store = new VueX.Store({

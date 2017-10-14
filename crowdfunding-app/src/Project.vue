@@ -1,21 +1,94 @@
 <template>
     <div>
-        Home Page
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <router-link class="navbar-brand" :to="{ name: 'projects' }">Crowdfunding Website</router-link>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><router-link :to="{ name: 'projects' }">Projects</router-link></li>
+                </ul>
+                <div v-if="this.$store.state.authenticationToken">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
+                        <li><router-link :to="{ name: 'myProjects' }"><span class="glyphicon glyphicon-edit"></span> Manage My Projects</router-link></li>
+                        <li><router-link @click.native="logOut()" :to="{ name: 'projects'}"><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
+                    </ul>
+                </div>
+
+                <div v-else>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
+
+                        <li class="dropdown">
+                            <router-link :to="{ name: 'project' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <div class="form-group">
+                                        <label for="usernameEmailProject">Username or Email</label>
+                                        <input type="text" class="form-control" id="usernameEmailProject" v-model="cUsername" placeholder="Username/Email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="passwordProject">Password</label>
+                                        <input type="password" class="form-control" id="passwordProject" v-model="cPassword" placeholder="Password">
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
         <div v-if="errorFlag" style="color: red;">
             {{ error }}
         </div>
 
-        <div id="project">
-            <router-link :to="{ name: 'projects' }">Back to all Projects</router-link>
+        <p>{{ extra }}</p>
+        <p>{{ $store.state.authenticationToken }}</p>
 
+        <div id="project">
             <br /><br />
-            <table>
-                <tr>
-                    <td>{{ $route.params.projectId }}</td>
-                    <td>{{ getSingleProject($route.params.projectId).title }}</td>
-                </tr>
-            </table>
-        </div>>
+            <h2>{{ singleProject.title }}</h2>
+            <h4>{{ singleProject.subtitle }}</h4>
+            <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
+
+            <br />
+            Project created on:
+            <p>{{ getDate() }}</p>
+
+            <br />
+            Description:
+            <p>{{ singleProject.description }}</p>
+
+            <br />
+            Target:
+            <p>{{ singleProject.target }}</p>
+
+            <br />
+            Creator(s):
+            <p v-for="creator in getCreators()">
+                {{ creator.username }}
+            </p>
+
+            <br />
+            Rewards:
+            <p v-for="reward in getRewards()">
+                ${{ reward.amount / 100 }}
+                : {{ reward.description }}
+            </p>
+
+            <!--Include Recent Pledges and Anonymous Pledges-->
+            <br />
+            Progress
+            <p>Total Pledged: {{ singleProject.progress.currentPledged }}</p>
+            <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
+        </div>
     </div>
 </template>
 
@@ -25,33 +98,70 @@
             return {
                 error: "",
                 errorFlag: false,
-                projects: []
+                singleProject: "",
+                cUsername: "",
+                cPassword: "",
+                extra: "Start"
             }
         },
         mounted: function (){
-            this.getProjects();
+            this.getSingleProjectDetails(this.$route.params.projectId);
         },
         methods: {
-            getProjects: function(){
-                this.$http.get("http://localhost:4941/api/v2/projects")
+            getSingleProjectDetails: function(id){
+                this.$http.get("http://localhost:4941/api/v2/projects/" + id)
                     .then(function (response) {
-                        this.projects = response.data;
-
-                        for (let i = 1; i < 5; i++) {
-                            this.projects.push(this.projects[0]);
-                        }
+                        this.singleProject = response.data;
                     }, function (error) {
                         this.error = error;
                         this.errorFlag = true;
                     });
             },
-            getSingleProject: function(id){
-                for(let i = 0; i <= this.projects.length; i++){
-                    if(this.projects[i].id === id){
-                        return this.projects[i];
-                    }
-                }
+            getCreators: function(){
+                return this.singleProject.creators;
+            },
+            getRewards: function(){
+                return this.singleProject.rewards;
+            },
+            getDate: function(){
+                let date = new Date(this.singleProject.creationDate);
+                return date.toLocaleDateString();
             }
+        },
+        logIn: function(){
+            this.errorFlag = false;
+            this.extra = "I have something here!";
+            this.$http.post("http://localhost:4941/api/v2/users/login", {}, {
+                params: {
+                    username: this.cUsername,
+                    email: this.cUsername,
+                    password: this.cPassword
+                }
+            }).then(function(response){
+                this.extra = response;
+                this.$store.commit('changeId', response.data.id);
+                this.$store.commit('changeToken', response.data.token);
+                this.cUsername = "";
+                this.cPassword = "";
+            }, function(error) {
+                this.error = "Error Logging In!";
+                this.errorFlag = true;
+            });
+        },
+        logOut: function() {
+            this.errorFlag = false;
+            this.$http.post("http://localhost:4941/api/v2/users/logout", {}, {
+                headers: {
+                    'X-Authorization': this.$store.state.authenticationToken
+                }
+            }).then(function(response){
+                this.extra = response;
+                this.$store.commit('changeId', -1);
+                this.$store.commit('changeToken', "");
+            }, function(error) {
+                this.error = "Error Logging Out!";
+                this.errorFlag = true;
+            });
         }
     }
 </script>
