@@ -26,12 +26,12 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <div class="form-group">
-                                        <label for="usernameEmailProject">Username or Email</label>
-                                        <input type="text" class="form-control" id="usernameEmailProject" v-model="cUsername" placeholder="Username/Email">
+                                        <label for="usernameEmail">Username or Email</label>
+                                        <input type="text" class="form-control" id="usernameEmail" v-model="cUsername" placeholder="Username/Email">
                                     </div>
                                     <div class="form-group">
-                                        <label for="passwordProject">Password</label>
-                                        <input type="password" class="form-control" id="passwordProject" v-model="cPassword" placeholder="Password">
+                                        <label for="password">Password</label>
+                                        <input type="password" class="form-control" id="password" v-model="cPassword" placeholder="Password">
                                     </div>
                                     <div class="form-group">
                                         <button type="submit" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
@@ -49,7 +49,6 @@
             {{ error }}
         </div>
 
-        <p>{{ extra }}</p>
         <p>{{ $store.state.authenticationToken }}</p>
 
         <div id="project">
@@ -100,8 +99,7 @@
                 errorFlag: false,
                 singleProject: "",
                 cUsername: "",
-                cPassword: "",
-                extra: "Start"
+                cPassword: ""
             }
         },
         mounted: function (){
@@ -126,42 +124,39 @@
             getDate: function(){
                 let date = new Date(this.singleProject.creationDate);
                 return date.toLocaleDateString();
+            },
+            logIn: function(){
+                this.errorFlag = false;
+                this.$http.post("http://localhost:4941/api/v2/users/login", {}, {
+                    params: {
+                        username: this.cUsername,
+                        email: this.cUsername,
+                        password: this.cPassword
+                    }
+                }).then(function(response){
+                    this.$store.commit('changeId', response.data.id);
+                    this.$store.commit('changeToken', response.data.token);
+                    this.cUsername = "";
+                    this.cPassword = "";
+                }, function(error) {
+                    this.error = "Error Logging In!";
+                    this.errorFlag = true;
+                });
+            },
+            logOut: function() {
+                this.errorFlag = false;
+                this.$http.post("http://localhost:4941/api/v2/users/logout", {}, {
+                    headers: {
+                        'X-Authorization': this.$store.state.authenticationToken
+                    }
+                }).then(function(response){
+                    this.$store.commit('changeId', -1);
+                    this.$store.commit('changeToken', "");
+                }, function(error) {
+                    this.error = "Error Logging Out!";
+                    this.errorFlag = true;
+                });
             }
-        },
-        logIn: function(){
-            this.errorFlag = false;
-            this.extra = "I have something here!";
-            this.$http.post("http://localhost:4941/api/v2/users/login", {}, {
-                params: {
-                    username: this.cUsername,
-                    email: this.cUsername,
-                    password: this.cPassword
-                }
-            }).then(function(response){
-                this.extra = response;
-                this.$store.commit('changeId', response.data.id);
-                this.$store.commit('changeToken', response.data.token);
-                this.cUsername = "";
-                this.cPassword = "";
-            }, function(error) {
-                this.error = "Error Logging In!";
-                this.errorFlag = true;
-            });
-        },
-        logOut: function() {
-            this.errorFlag = false;
-            this.$http.post("http://localhost:4941/api/v2/users/logout", {}, {
-                headers: {
-                    'X-Authorization': this.$store.state.authenticationToken
-                }
-            }).then(function(response){
-                this.extra = response;
-                this.$store.commit('changeId', -1);
-                this.$store.commit('changeToken', "");
-            }, function(error) {
-                this.error = "Error Logging Out!";
-                this.errorFlag = true;
-            });
         }
     }
 </script>

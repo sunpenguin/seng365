@@ -26,12 +26,12 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <div class="form-group">
-                                        <label for="usernameEmailUserProjects">Username or Email</label>
-                                        <input type="text" class="form-control" id="usernameEmailUserProjects" v-model="cUsername" placeholder="Username/Email">
+                                        <label for="usernameEmail">Username or Email</label>
+                                        <input type="text" class="form-control" id="usernameEmail" v-model="cUsername" placeholder="Username/Email">
                                     </div>
                                     <div class="form-group">
-                                        <label for="passwordUserProjects">Password</label>
-                                        <input type="password" class="form-control" id="passwordUserProjects" v-model="cPassword" placeholder="Password">
+                                        <label for="password">Password</label>
+                                        <input type="password" class="form-control" id="password" v-model="cPassword" placeholder="Password">
                                     </div>
                                     <div class="form-group">
                                         <button type="submit" @click="logIn()" class="btn btn-primary btn-block">Log in</button>

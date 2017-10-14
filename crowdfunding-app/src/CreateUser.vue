@@ -26,12 +26,12 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <div class="form-group">
-                                        <label for="usernameEmailCreateUser">Username or Email</label>
-                                        <input type="text" class="form-control" id="usernameEmailCreateUser" v-model="cUsername" placeholder="Username/Email">
+                                        <label for="usernameEmail">Username or Email</label>
+                                        <input type="text" class="form-control" id="usernameEmail" v-model="cUsername" placeholder="Username/Email">
                                     </div>
                                     <div class="form-group">
-                                        <label for="passwordCreateUser">Password</label>
-                                        <input type="password" class="form-control" id="passwordCreateUser" v-model="cPassword" placeholder="Password">
+                                        <label for="password">Password</label>
+                                        <input type="password" class="form-control" id="password" v-model="cPassword" placeholder="Password">
                                     </div>
                                     <div class="form-group">
                                         <button type="submit" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
@@ -120,11 +120,29 @@
                     }
                 })
                     .then(function (response) {
-                        this.logIn();
+                        this.logInAfterCreation();
                     }, function (error) {
                         this.error = "There was an error creating your account. Try using a different username and/or email.";
                         this.errorFlag = true;
                     });
+            },
+            logInAfterCreation: function(){
+                this.errorFlag = false;
+                this.$http.post("http://localhost:4941/api/v2/users/login", {}, {
+                    params: {
+                        username: this.newUsername,
+                        email: this.newUsername,
+                        password: this.newPassword
+                    }
+                }).then(function(response){
+                    this.$store.commit('changeId', response.data.id);
+                    this.$store.commit('changeToken', response.data.token);
+                    this.cUsername = "";
+                    this.cPassword = "";
+                }, function(error) {
+                    this.error = error;
+                    this.errorFlag = true;
+                });
             },
             logIn: function(){
                 this.errorFlag = false;
@@ -140,7 +158,7 @@
                     this.cUsername = "";
                     this.cPassword = "";
                 }, function(error) {
-                    this.error = "Error Logging In!";
+                    this.error = error;
                     this.errorFlag = true;
                 });
             },
