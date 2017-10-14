@@ -11,7 +11,7 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="active"><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
-                    <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-log-in"></span> Login</router-link></li>
+                    <li><router-link :to="{ name: 'logIn' }"><span class="glyphicon glyphicon-log-in"></span> Login</router-link></li>
                 </ul>
             </div>
         </nav>

@@ -9,12 +9,22 @@
                     <li class="active"><router-link :to="{ name: 'projects' }">Projects</router-link></li>
                     <li><router-link :to="{ name: 'user' }">User</router-link></li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
-                    <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-log-in"></span> Login</router-link></li>
-                </ul>
+                    <div v-if="this.$store.state.authenticationToken">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><router-link :to="{ name: 'userDetails' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
+                            <li><router-link :to="{ name: 'logIn' }"><span class="glyphicon glyphicon-log-in"></span> Log Out</router-link></li>
+                        </ul>
+                    </div>
+
+                    <div v-else>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
+                            <li><router-link :to="{ name: 'logIn' }"><span class="glyphicon glyphicon-log-in"></span> Login</router-link></li>
+                        </ul>
+                    </div>
             </div>
         </nav>
+
         <div v-if="errorFlag" style="color: red;">
             {{ error }}
         </div>
@@ -66,7 +76,7 @@
         <div v-else>
             Search Projects <input type="search" v-model="searchString" placeholder="Search Projects" />
             <br /><br />
-            <div id="projectsList">
+            <div id="projectsList" v-cloak>
                 <ul>
                     <li class="projectSummary" v-for="project in searchProjects">
                         <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
@@ -75,6 +85,9 @@
                         <router-link @click.native="getSingleProjectDetails(project.id)" :to="{ name: 'project', params: { projectId: project.id }}">View Details</router-link>
                     </li>
                 </ul>
+                <br />
+                <p>{{ $store.state.authenticationToken }}</p>
+                <p>Counter: {{ counter }}, Range: {{ sRange }}, AuthToken: {{ projects.length }}, {{ counter2 }}</p>
             </div>
         </div>
     </div>
@@ -89,7 +102,10 @@
                 errorFlag: false,
                 projects: [],
                 singleProject: "",
-                authToken: ""
+                authToken: "",
+                sRange: 1,
+                counter: 0,
+                counter2: 0
             }
         },
         mounted: function (){
@@ -133,18 +149,27 @@
             },
             loggedIn: function(){
                 return this.authToken;
+            },
+            hasSpace: function(){
+                this.counter += 1;
+                if (this.counter < this.counter2) {
+                    return true;
+                }
+                this.counter -= 1;
+                return false;
             }
         },
         computed: {
             searchProjects: function(){
+                this.counter = 0;
+                this.counter2 = this.projects.length;
+
                 let projects = this.projects,
                    searchString  = this.searchString;
 
                 if (!searchString) {
                     return projects;
                 }
-
-                this.number+=1;
 
                 searchString = searchString.trim().toLowerCase();
 
