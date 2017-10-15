@@ -26,15 +26,20 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <div class="form-group">
-                                        <label for="usernameEmail">Username or Email</label>
+                                        <label for="usernameEmail" class="col-sm-10">Username or Email</label>
                                         <input type="text" class="form-control" id="usernameEmail" v-model="cUsername" placeholder="Username/Email">
                                     </div>
                                     <div class="form-group">
-                                        <label for="password">Password</label>
+                                        <label for="password" class="col-sm-10">Password</label>
                                         <input type="password" class="form-control" id="password" v-model="cPassword" placeholder="Password">
                                     </div>
                                     <div class="form-group">
-                                        <button type="submit" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
+                                        <button type="button" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <div v-if="errorFlag" style="color: red; text-align: center">
+                                            {{ error }}
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -44,10 +49,6 @@
                 </div>
             </div>
         </nav>
-
-        <div v-if="errorFlag" style="color: red;">
-            {{ error }}
-        </div>
 
         Search Projects <input type="search" v-model="searchString" placeholder="Search Projects" />
         <br /><br />

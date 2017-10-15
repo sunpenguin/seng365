@@ -6,7 +6,7 @@
                     <router-link class="navbar-brand" :to="{ name: 'projects' }">Crowdfunding Website</router-link>
                 </div>
                 <ul class="nav navbar-nav">
-                    <li class="active"><router-link :to="{ name: 'projects' }">Projects</router-link></li>
+                    <li><router-link :to="{ name: 'projects' }">Projects</router-link></li>
                 </ul>
                 <div v-if="this.$store.state.authenticationToken">
                     <ul class="nav navbar-nav navbar-right">
@@ -18,23 +18,28 @@
 
                 <div v-else>
                     <ul class="nav navbar-nav navbar-right">
-                        <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
+                        <li class="active"><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
 
-                        <li class="dropdown">
-                            <router-link :to="{ name: 'createUser' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
+                        <li class="dropdown disabled">
+                            <router-link :to="{ name: 'createUser' }" class="dropdown-toggle disabled" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
 
                             <ul class="dropdown-menu">
                                 <li>
                                     <div class="form-group">
-                                        <label for="usernameEmail">Username or Email</label>
+                                        <label for="usernameEmail" class="col-sm-10">Username or Email</label>
                                         <input type="text" class="form-control" id="usernameEmail" v-model="cUsername" placeholder="Username/Email">
                                     </div>
                                     <div class="form-group">
-                                        <label for="password">Password</label>
+                                        <label for="password" class="col-sm-10">Password</label>
                                         <input type="password" class="form-control" id="password" v-model="cPassword" placeholder="Password">
                                     </div>
                                     <div class="form-group">
                                         <button type="submit" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
+                                    </div>
+                                    <div class="form-group">
+                                        <div v-if="errorFlag" style="color: red; text-align: center">
+                                            {{ error }}
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -44,24 +49,39 @@
                 </div>
             </div>
         </nav>
-        <div v-if="errorFlag" style="color: red;">
-            {{ error }}
-        </div>
 
-        <div id="newUserForm">
-            <br />
-            Username <input type="text" v-model="newUsername" placeholder="Username">
-            <br />
-            Password <input type="password" v-model="newPassword" placeholder="Password">
-            <br />
-            E-mail <input type="email" v-model="newEmail" placeholder="Email Address">
-            <br />
-            Location <input type="text" v-model="newLocation" placeholder="(optional)">
-            <br />
-            <button @click="createNewUser()">Create New Account</button>
-            <br />
-            <p>{{ userId }}</p>
-            <p>{{ currentAuthenticationToken }}</p>
+        <div class="container">
+            <div class="form-group row">
+                <label for="inputUsername" class="col-sm-3 col-form-label">Username</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" id="inputUsername" v-model="newUsername" placeholder="Username" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputEmail" class="col-sm-3 col-form-label">Email Address</label>
+                <div class="col-sm-7">
+                    <input type="email" class="form-control" id="inputEmail" v-model="newEmail" placeholder="Email Address" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
+                <div class="col-sm-7">
+                    <input type="password" class="form-control" id="inputPassword" v-model="newPassword" placeholder="Password" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputLocation" class="col-sm-3 col-form-label">Location</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" id="inputLocation" v-model="newLocation" placeholder="Location (optional)">
+                </div>
+            </div>
+            <div class="form-group row" v-if="errorFlag" style="color: red;">
+                {{ error }}
+            </div>
+            <div class="form-group row">
+                <button @click="createNewUser()" type="submit" class="btn btn-primary">Create Account</button>
+                <router-link @click.native="logOut()" :to="{ name: 'projects'}"><button type="submit" class="btn btn-primary">Cancel</button></router-link>
+            </div>
         </div>
     </div>
 </template>
@@ -78,10 +98,8 @@
                 newPassword: "",
                 newLocation: "",
 
-                userId: "",
-                currentAuthenticationToken: "",
                 cUsername: "",
-                cPassword: ""
+                cPassword: "",
 
             }
         },
