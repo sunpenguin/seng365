@@ -83,7 +83,7 @@
                 </div>
                 <div class="form-group row">
                     <button @click="editAccount()" type="submit" class="btn btn-primary">Edit Account</button>
-                    <router-link @click.native="logOut()" :to="{ name: 'projects'}"><button type="submit" class="btn btn-primary">Back to Projects</button></router-link>
+                    <router-link :to="{ name: 'projects'}"><button type="submit" class="btn btn-primary">Back to Projects</button></router-link>
                 </div>
                 <div class="form-group row" v-if="errorFlag" style="color: red;">
                     {{ error }}

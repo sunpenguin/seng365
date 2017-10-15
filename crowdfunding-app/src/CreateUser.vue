@@ -175,6 +175,8 @@
                     this.$store.commit('changeToken', response.data.token);
                     this.cUsername = "";
                     this.cPassword = "";
+                    this.error = "Successfully created and logged in.";
+                    this.errorFlag = true;
                 }, function(error) {
                     this.error = error;
                     this.errorFlag = true;

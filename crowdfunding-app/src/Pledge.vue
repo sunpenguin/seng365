@@ -21,7 +21,7 @@
                         <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
 
                         <li class="dropdown">
-                            <router-link :to="{ name: 'project' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
+                            <router-link :to="{ name: 'pledge' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
 
                             <ul class="dropdown-menu">
                                 <li>
@@ -34,7 +34,7 @@
                                         <input type="password" class="form-control" id="password" v-model="cPassword" placeholder="Password">
                                     </div>
                                     <div class="form-group">
-                                        <button type="submit" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
+                                        <button type="button" @click="logIn()" class="btn btn-primary btn-block">Log in</button>
                                     </div>
                                     <div class="form-group">
                                         <div v-if="errorFlag" style="color: red; text-align: center">
@@ -50,61 +50,44 @@
             </div>
         </nav>
 
-        <div v-if="errorFlag" style="color: red;">
+        <div v-if="this.$store.state.userId > 0">
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" class="form-control" id="amount" aria-describedby="amountHelp" v-model="amount" placeholder="Enter amount">
+                <small id="amountHelp" class="for-text text-muted">Enter the amount in dollars.</small>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    Anonymous donation:
+                    <input type="checkbox" v-model="anonymous" class="form-check-input">
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="amount">Card Number</label>
+                <input type="number" class="form-control" id="amount" aria-describedby="amountHelp" placeholder="Enter card number">
+                <small id="amountHelp" class="for-text text-muted">Card Number.</small>
+
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" aria-describedby="nameHelp" placeholder="Enter card name">
+                <small id="nameHelp" class="for-text text-muted">The name on the card.</small>
+
+                <label for="expiry">Expiry Date</label>
+                <input type="date" class="form-control" id="expiry" aria-describedby="expiryHelp" placeholder="Enter card name">
+                <small id="expiryHelp" class="for-text text-muted">The expiry date of the card.</small>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary" @click="pledge()">Pledge</button>
+            </div>
+        </div>
+
+        <div v-else>
+            PLEASE LOG IN YOU TOMATO PIE!
+        </div>
+
+        <div v-if="errorFlag">
             {{ error }}
         </div>
 
-        <b-container id="project" fluid>
-            <b-row>
-                <b-col lg="7">
-                    <h2>{{ singleProject.title }}</h2>
-                    <h4>{{ singleProject.subtitle }}</h4>
-                    <br />
-                    Project created on: {{ getDate() }} by creator(s):
-                    <ul v-for="creator in getCreators()">
-                        <li>{{ creator.username }}</li>
-                    </ul>
-
-                </b-col>
-                <b-col lg="2"></b-col>
-                <b-col lg="5">
-                    Target:
-                    <p>${{ singleProject.target / 100 }}</p>
-
-                    <!--Include Recent Pledges and Anonymous Pledges-->
-                    Progress
-                    <div>
-                        <b-progress :value="singleProject.progress.currentPledged / 100" :max="singleProject.target / 100"></b-progress>
-                    </div>
-                    <p>Total Pledged: {{ singleProject.progress.currentPledged / 100}}</p>
-                    <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
-
-                    <!--Fund this project <br /> <br />-->
-                    <!--<label :for="pledgeAmount">Amount</label>-->
-                    <!--<b-form-input :id="pledgeAmount" :type="text" placeholder="Enter the amount you wish to pledge in dollars."></b-form-input>-->
-                    <!--Create a router link for pledges and move the above elements somewhere else-->
-                    <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
-
-                    <br /> <br />
-                </b-col>
-            </b-row>
-            <b-row>
-                <b-col lg="7">
-                    <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
-                    <br />
-                    Description:
-                    <p>{{ singleProject.description }}</p>
-                </b-col>
-                <b-col lg="2"></b-col>
-                <b-col lg="5">
-                    Rewards:
-                    <p v-for="reward in getRewards()">
-                        ${{ reward.amount / 100 }}
-                        : {{ reward.description }}
-                    </p>
-                </b-col>
-            </b-row>
-        </b-container>
     </div>
 </template>
 
@@ -114,33 +97,41 @@
             return {
                 error: "",
                 errorFlag: false,
-                singleProject: "",
+
+                amount: "121212",
+                anonymous: true,
+                token: "accept",
+
                 cUsername: "",
                 cPassword: ""
             }
         },
         mounted: function (){
-            this.getSingleProjectDetails(this.$route.params.projectId);
         },
         methods: {
-            getSingleProjectDetails: function(id){
-                this.$http.get("http://localhost:4941/api/v2/projects/" + id)
-                    .then(function (response) {
-                        this.singleProject = response.data;
-                    }, function (error) {
-                        this.error = error;
-                        this.errorFlag = true;
-                    });
-            },
-            getCreators: function(){
-                return this.singleProject.creators;
-            },
-            getRewards: function(){
-                return this.singleProject.rewards;
-            },
-            getDate: function(){
-                let date = new Date(this.singleProject.creationDate);
-                return date.toLocaleDateString();
+            pledge: function(){
+                this.errorFlag = false;
+                this.$http.post("http://localhost:4941/api/v2/projects/" + this.$route.params.projectId + "/pledge", {
+                    id: this.$store.state.userId,
+                    amount: this.amount * 100,
+                    anonymous: this.anonymous,
+                    card: {
+                        authToken: this.token
+                    }
+                }, {
+                    headers: {
+                        'X-Authorization': this.$store.state.authenticationToken,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(function(response){
+                    this.error = "Successfully pledged your amount.";
+                    this.amount = "";
+                    this.anonymous = false;
+                    this.errorFlag = true;
+                }, function(error){
+                    this.error = error;
+                    this.errorFlag = true;
+                });
             },
             logIn: function(){
                 this.errorFlag = false;

@@ -6,6 +6,7 @@ import User from './User.vue'
 import CreateUser from './CreateUser.vue'
 import UserProjects from './UserProjects.vue'
 import CreateProject from './CreateProject.vue'
+import Pledge from './Pledge.vue'
 
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
@@ -46,12 +47,17 @@ const routes = [
     {
         path: "/myProjects",
         name: "myProjects",
-        components: UserProjects
+        component: UserProjects
     },
     {
         path: "/createProject",
         name: "createProject",
         component: CreateProject
+    },
+    {
+        path: "/pledge/:projectId",
+        name: "pledge",
+        component: Pledge
     }
 ];
 
