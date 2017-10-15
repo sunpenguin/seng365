@@ -50,26 +50,45 @@
             </div>
         </nav>
 
-        <div v-if="errorFlag" style="color: red;">
-            {{ error }}
-        </div>
-
         <div id="user">
             <br />
-
-            {{ token }}
 
             <p>AND HIS NAME IS...</p>
             <h1>JOHN CENA!</h1>
 
-            <br />
-            Username <input type="text" v-model="currentUsername" placeholder=currentUsername>
-            <br />
-            Password <input type="password" v-model="currentPassword" placeholder=currentPassword>
-            <br />
-            E-mail <input type="email" v-model="currentEmail" placeholder="Email Address">
-            <br />
-            Location <input type="text" v-model="currentLocation" placeholder="(optional)">
+            <div class="container">
+                <div class="form-group row">
+                    <label for="inputUsername" class="col-sm-3 col-form-label">Username</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" id="inputUsername" v-model="currentUsername" placeholder="Username" required readonly>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputEmail" class="col-sm-3 col-form-label">Email Address</label>
+                    <div class="col-sm-7">
+                        <input type="email" class="form-control" id="inputEmail" v-model="currentEmail" placeholder="Email Address" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
+                    <div class="col-sm-7">
+                        <input type="password" class="form-control" id="inputPassword" v-model="currentPassword" placeholder="Password" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="inputLocation" class="col-sm-3 col-form-label">Location</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" id="inputLocation" v-model="currentLocation" placeholder="Location (optional)">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <button @click="editAccount()" type="submit" class="btn btn-primary">Edit Account</button>
+                    <router-link @click.native="logOut()" :to="{ name: 'projects'}"><button type="submit" class="btn btn-primary">Back to Projects</button></router-link>
+                </div>
+                <div class="form-group row" v-if="errorFlag" style="color: red;">
+                    {{ error }}
+                </div>
+            </div>
 
         </div>
     </div>
@@ -87,7 +106,6 @@
                 currentPassword: "",
                 currentLocation: "",
 
-                token: "",
                 cUsername: "",
                 cPassword: ""
             }
@@ -105,10 +123,42 @@
                     .then(function(response){
                         this.currentUsername = response.data.username;
                         this.currentEmail = response.data.email;
-//                        this.currentPassword = response.data.password;
                         this.currentLocation = response.data.location;
                     }, function(error){
                         this.error = error;
+                        this.errorFlag = true;
+                    })
+            },
+            editAccount: function(){
+                this.errorFlag = false;
+
+                if (!this.currentPassword) {
+                    this.error = "Please enter a password.";
+                    this.errorFlag = true;
+                    return;
+                }
+                let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if (!this.currentEmail || !emailRegex.test(this.currentEmail)) {
+                    this.error = "Please enter a valid email address.";
+                    this.errorFlag = true;
+                    return;
+                }
+
+                this.$http.put("http://localhost:4941/api/v2/users/" + this.$store.state.userId, {
+                    username: this.currentUsername,
+                    email: this.currentEmail,
+                    password: this.currentPassword,
+                    location: this.currentLocation
+                }, {
+                    headers: {
+                        'X-Authorization': this.$store.state.authenticationToken
+                    }
+                })
+                    .then(function(response){
+                        this.error = "Account details successfully edited.";
+                        this.errorFlag = true;
+                    }, function(error){
+                        this.error = "Error editing your account details. Please try again.";
                         this.errorFlag = true;
                     })
             },
