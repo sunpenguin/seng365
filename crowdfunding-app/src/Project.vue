@@ -54,44 +54,48 @@
             {{ error }}
         </div>
 
-        <p>{{ $store.state.authenticationToken }}</p>
+        <div id="project" class="container-fluid">
+            <div class="row">
+                <div class="col-lg-7">
+                    <h2>{{ singleProject.title }}</h2>
+                    <h4>{{ singleProject.subtitle }}</h4>
+                    <br />
+                    Project created on: {{ getDate() }} by creator(s):
+                    <ul v-for="creator in getCreators()">
+                        <li>{{ creator.username }}</li>
+                    </ul>
 
-        <div id="project">
-            <br /><br />
-            <h2>{{ singleProject.title }}</h2>
-            <h4>{{ singleProject.subtitle }}</h4>
-            <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
+                </div>
+                <div class="col-lg-2"></div>
+                <div class="col-lg-5">
+                    Target:
+                    <p>${{ singleProject.target / 100 }}</p>
 
-            <br />
-            Project created on:
-            <p>{{ getDate() }}</p>
-
-            <br />
-            Description:
-            <p>{{ singleProject.description }}</p>
-
-            <br />
-            Target:
-            <p>{{ singleProject.target }}</p>
-
-            <br />
-            Creator(s):
-            <p v-for="creator in getCreators()">
-                {{ creator.username }}
-            </p>
-
-            <br />
-            Rewards:
-            <p v-for="reward in getRewards()">
-                ${{ reward.amount / 100 }}
-                : {{ reward.description }}
-            </p>
-
-            <!--Include Recent Pledges and Anonymous Pledges-->
-            <br />
-            Progress
-            <p>Total Pledged: {{ singleProject.progress.currentPledged }}</p>
-            <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
+                    <!--Include Recent Pledges and Anonymous Pledges-->
+                    Progress
+                    <div>
+                        <b-progress :value="singleProject.progress.currentPledged / 100" :max="singleProject.target / 100"></b-progress>
+                    </div>
+                    <p>Total Pledged: {{ singleProject.progress.currentPledged }}</p>
+                    <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-7">
+                    <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
+                    <br />
+                    Description:
+                    <p>{{ singleProject.description }}</p>
+                </div>
+                <div class="col-lg-2"></div>
+                <div class="col-lg-5">
+                    Rewards:
+                    <p v-for="reward in getRewards()">
+                        ${{ reward.amount / 100 }}
+                        : {{ reward.description }}
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </template>
