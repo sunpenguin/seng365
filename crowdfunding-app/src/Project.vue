@@ -54,9 +54,9 @@
             {{ error }}
         </div>
 
-        <div id="project" class="container-fluid">
-            <div class="row">
-                <div class="col-lg-7">
+        <b-container id="project" fluid>
+            <b-row>
+                <b-col lg="7">
                     <h2>{{ singleProject.title }}</h2>
                     <h4>{{ singleProject.subtitle }}</h4>
                     <br />
@@ -65,9 +65,9 @@
                         <li>{{ creator.username }}</li>
                     </ul>
 
-                </div>
-                <div class="col-lg-2"></div>
-                <div class="col-lg-5">
+                </b-col>
+                <b-col lg="2"></b-col>
+                <b-col lg="5">
                     Target:
                     <p>${{ singleProject.target / 100 }}</p>
 
@@ -78,25 +78,33 @@
                     </div>
                     <p>Total Pledged: {{ singleProject.progress.currentPledged }}</p>
                     <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-7">
+
+                    <!--Fund this project <br /> <br />-->
+                    <!--<label :for="pledgeAmount">Amount</label>-->
+                    <!--<b-form-input :id="pledgeAmount" :type="text" placeholder="Enter the amount you wish to pledge in dollars."></b-form-input>-->
+                    <!--Create a router link for pledges and move the above elements somewhere else-->
+                    <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
+
+                    <br /> <br />
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col lg="7">
                     <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
                     <br />
                     Description:
                     <p>{{ singleProject.description }}</p>
-                </div>
-                <div class="col-lg-2"></div>
-                <div class="col-lg-5">
+                </b-col>
+                <b-col lg="2"></b-col>
+                <b-col lg="5">
                     Rewards:
                     <p v-for="reward in getRewards()">
                         ${{ reward.amount / 100 }}
                         : {{ reward.description }}
                     </p>
-                </div>
-            </div>
-        </div>
+                </b-col>
+            </b-row>
+        </b-container>
     </div>
 </template>
 

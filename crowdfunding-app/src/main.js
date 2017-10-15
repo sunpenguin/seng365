@@ -7,7 +7,6 @@ import CreateUser from './CreateUser.vue'
 import UserProjects from './UserProjects.vue'
 import CreateProject from './CreateProject.vue'
 
-
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
