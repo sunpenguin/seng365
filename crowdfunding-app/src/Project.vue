@@ -64,7 +64,8 @@
                     <ul v-for="creator in getCreators()">
                         <li>{{ creator.username }}</li>
                     </ul>
-
+                    <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
+                    <br />
                 </b-col>
                 <b-col lg="2"></b-col>
                 <b-col lg="5">
@@ -79,29 +80,38 @@
                     <p>Total Pledged: {{ singleProject.progress.currentPledged / 100}}</p>
                     <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
 
+                    <br />
+                    <div if v-if="singleProject.open">
+                        <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
+                    </div>
+                    <div v-else>
+                        <b-button :size="lg" :variant="primary" disabled><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
+                    </div>
+
+                    <div>
+                        <h4>Recent Pledges</h4>
+                        <p v-for="pledge in recentPledges()">
+                            {{ pledge.username }} pledged {{ pledge.amount / 100}}
+                        </p>
+                    </div>
+                    <br />
+                    Rewards:
+                    <p v-for="reward in getRewards()">
+                        ${{ reward.amount / 100 }}
+                        : {{ reward.description }}
+                    </p>
+
                     <!--Fund this project <br /> <br />-->
                     <!--<label :for="pledgeAmount">Amount</label>-->
                     <!--<b-form-input :id="pledgeAmount" :type="text" placeholder="Enter the amount you wish to pledge in dollars."></b-form-input>-->
-                    <!--Create a router link for pledges and move the above elements somewhere else-->
-                    <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
 
                     <br /> <br />
                 </b-col>
             </b-row>
             <b-row>
                 <b-col lg="7">
-                    <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
-                    <br />
                     Description:
                     <p>{{ singleProject.description }}</p>
-                </b-col>
-                <b-col lg="2"></b-col>
-                <b-col lg="5">
-                    Rewards:
-                    <p v-for="reward in getRewards()">
-                        ${{ reward.amount / 100 }}
-                        : {{ reward.description }}
-                    </p>
                 </b-col>
             </b-row>
         </b-container>
@@ -141,6 +151,44 @@
             getDate: function(){
                 let date = new Date(this.singleProject.creationDate);
                 return date.toLocaleDateString();
+            },
+            recentPledges: function(){
+                let pledges = this.singleProject.backers;
+                let recentPledges = [];
+                let finalCount = 0;
+                let currentIndex = 0;
+                let anonBacker = false;
+                while(finalCount < 5){
+                    if(currentIndex >= pledges.length){
+                        break;
+                    }
+                    if(pledges[currentIndex].username === "anonymous"){
+                        if(!anonBacker ){
+                            anonBacker = true;
+                            recentPledges.push(this.getAnonBacker(currentIndex));
+                            finalCount += 1;
+                        }
+                    }else{
+                        recentPledges.push(pledges[currentIndex]);
+                        finalCount += 1;
+                    }
+                    currentIndex += 1;
+                }
+                return recentPledges;
+            },
+            getAnonBacker: function(){
+                let pledges = this.singleProject.backers;
+                let anonBacker = {
+                    id: 0,
+                    username: "anonymous",
+                    amount: 0
+                };
+                for(let i = 0; i < pledges.length; i++){
+                    if(pledges[i].username === "anonymous"){
+                        anonBacker.amount += pledges[i].amount;
+                    }
+                }
+                return anonBacker;
             },
             logIn: function(){
                 this.errorFlag = false;
