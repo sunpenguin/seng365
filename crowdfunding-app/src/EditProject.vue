@@ -56,7 +56,7 @@
 
         <b-container id="project" fluid>
             <h1>
-                EDIT THIS PAGE BOI!
+                EDIT THIS PAGE BOI! ENGLAND IS MY CITY!
                 <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'myProjects' }">Cancel</router-link></b-button>
             </h1>
             <b-row>
