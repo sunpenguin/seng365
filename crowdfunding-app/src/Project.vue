@@ -74,9 +74,7 @@
 
                     <!--Include Recent Pledges and Anonymous Pledges-->
                     Progress
-                    <div>
-                        <b-progress :value="singleProject.progress.currentPledged / 100" :max="singleProject.target / 100"></b-progress>
-                    </div>
+                    <b-progress :value="singleProject.progress.currentPledged / 100" :max="singleProject.target / 100"></b-progress>
                     <p>Total Pledged: {{ singleProject.progress.currentPledged / 100}}</p>
                     <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
 

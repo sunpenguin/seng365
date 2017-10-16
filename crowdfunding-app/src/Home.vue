@@ -20,6 +20,13 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
 
+                        <!--<li>-->
+                            <!--<b-btn v-b-modal.logInModal>Log In Modal</b-btn>-->
+                            <!--<b-modal id="logInModal" title="Log In">-->
+                                <!--<form @submit.stop.prevent=""-->
+                            <!--</b-modal>-->
+                        <!--</li>-->
+
                         <li class="dropdown">
                             <router-link :to="{ name: 'projects' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
 

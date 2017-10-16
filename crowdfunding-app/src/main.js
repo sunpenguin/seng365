@@ -6,6 +6,7 @@ import User from './User.vue'
 import CreateUser from './CreateUser.vue'
 import UserProjects from './UserProjects.vue'
 import CreateProject from './CreateProject.vue'
+import EditProject from './EditProject.vue'
 import Pledge from './Pledge.vue'
 
 import VueRouter from 'vue-router';
@@ -19,6 +20,7 @@ Vue.use(VueX);
 
 import BootstrapVue from 'bootstrap-vue';
 Vue.use(BootstrapVue);
+//
 // import 'bootstrap/dist/css/bootstrap.css'
 // import 'bootstrap-vue/dist/bootstrap-vue.css'
 
@@ -58,6 +60,11 @@ const routes = [
         path: "/pledge/:projectId",
         name: "pledge",
         component: Pledge
+    },
+    {
+        path: "/editProject/:projectId",
+        name: "editProject",
+        component: EditProject
     }
 ];
 

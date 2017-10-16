@@ -50,7 +50,68 @@
             </div>
         </nav>
 
+        <div v-if="errorFlag" style="color: red;">
+            {{ error }}
+        </div>
 
+        <b-container id="project" fluid>
+            <h1>
+                EDIT THIS PAGE BOI!
+                <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'myProjects' }">Cancel</router-link></b-button>
+            </h1>
+            <b-row>
+                <b-col lg="7">
+                    <h2>{{ singleProject.title }}</h2>
+                    <h4>{{ singleProject.subtitle }}</h4>
+                    <br />
+                    Project created on: {{ getDate() }} by creator(s):
+                    <ul v-for="creator in getCreators()">
+                        <li>{{ creator.username }}</li>
+                    </ul>
+                    <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
+                    <br />
+                </b-col>
+                <b-col lg="2"></b-col>
+                <b-col lg="5">
+                    Target:
+                    <p>${{ singleProject.target / 100 }}</p>
+
+                    <!--Include Recent Pledges and Anonymous Pledges-->
+                    Progress
+                    <b-progress :value="singleProject.progress.currentPledged / 100" :max="singleProject.target / 100"></b-progress>
+                    <p>Total Pledged: {{ singleProject.progress.currentPledged / 100}}</p>
+                    <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
+
+                    <br />
+                    <div if v-if="singleProject.open">
+                        <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
+                    </div>
+                    <div v-else>
+                        <b-button :size="lg" :variant="primary" disabled><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
+                    </div>
+
+                    <div>
+                        <h4>Recent Pledges</h4>
+                        <p v-for="pledge in recentPledges()">
+                            {{ pledge.username }} pledged {{ pledge.amount / 100}}
+                        </p>
+                    </div>
+                    <br />
+                    Rewards:
+                    <p v-for="reward in getRewards()">
+                        ${{ reward.amount / 100 }}
+                        : {{ reward.description }}
+                    </p>
+                    <br /> <br />
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col lg="7">
+                    Description:
+                    <p>{{ singleProject.description }}</p>
+                </b-col>
+            </b-row>
+        </b-container>
     </div>
 </template>
 

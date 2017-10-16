@@ -12,7 +12,7 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
                         <li class="active"><router-link :to="{ name: 'myProjects' }"><span class="glyphicon glyphicon-edit"></span> Manage My Projects</router-link></li>
-                        <li><router-link @click.native="logOut()" :to="{ name: 'projects'}" ><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
+                        <li><router-link @click.native="logOut()" :to="{ name: 'projects'}"><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
                     </ul>
                 </div>
 
@@ -21,7 +21,7 @@
                         <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
 
                         <li class="dropdown">
-                            <router-link :to="{ name: 'userProjects' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
+                            <router-link :to="{ name: 'project' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
 
                             <ul class="dropdown-menu">
                                 <li>
@@ -49,6 +49,21 @@
                 </div>
             </div>
         </nav>
+            <h1>My Projects</h1>
+            <ul v-if="projects.length === 0">
+                <li>YOU HAVE NO PROJECTS!</li>
+            </ul>
+
+            <ul v-else>
+                <div id="projectsList">
+                    <li class="projectSummary" v-for="project in projects">
+                        <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
+                        <h4>{{ project.title }}</h4>
+                        <p>{{ project.subtitle }}</p>
+                        <router-link :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Project Details</router-link>
+                    </li>
+                </div>
+            </ul>
 
         <p>{{ error }}</p>
     </div>
@@ -58,13 +73,31 @@
     export default {
         data() {
             return {
-                error: "haHAA",
+                error: "ENGLAND IS MY CITY!",
                 errorFlag: false,
+                projects: [],
                 cUsername: "",
                 cPassword: ""
             }
         },
+        mounted: function(){
+            this.getMyProjects();
+        },
         methods: {
+            getMyProjects: function(){
+                this.$http.get("http://localhost:4941/api/v2/projects", {
+                    params: {
+                        open: true,
+                        creator: this.$store.state.userId
+                    }
+                })
+                    .then(function (response) {
+                        this.projects = response.data;
+                    }, function (error) {
+                        this.error = error;
+                        this.errorFlag = true;
+                    });
+            },
             logIn: function(){
                 this.errorFlag = false;
                 this.$http.post("http://localhost:4941/api/v2/users/login", {}, {
