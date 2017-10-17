@@ -54,64 +54,20 @@
             {{ error }}
         </div>
 
-        <b-container id="project" fluid>
-            <h1>
-                EDIT THIS PAGE BOI! ENGLAND IS MY CITY!
-                <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'myProjects' }">Cancel</router-link></b-button>
-            </h1>
-            <b-row>
-                <b-col lg="7">
-                    <h2>{{ singleProject.title }}</h2>
-                    <h4>{{ singleProject.subtitle }}</h4>
-                    <br />
-                    Project created on: {{ getDate() }} by creator(s):
-                    <ul v-for="creator in getCreators()">
-                        <li>{{ creator.username }}</li>
-                    </ul>
-                    <img v-bind:src="'http://localhost:4941/api/v2/projects/' + singleProject.id + '/image'" />
-                    <br />
-                </b-col>
-                <b-col lg="2"></b-col>
-                <b-col lg="5">
-                    Target:
-                    <p>${{ singleProject.target / 100 }}</p>
-
-                    <!--Include Recent Pledges and Anonymous Pledges-->
-                    Progress
-                    <b-progress :value="singleProject.progress.currentPledged / 100" :max="singleProject.target / 100"></b-progress>
-                    <p>Total Pledged: {{ singleProject.progress.currentPledged / 100}}</p>
-                    <p>Number of Backers: {{ singleProject.progress.numberOfBackers }}</p>
-
-                    <br />
-                    <div if v-if="singleProject.open">
-                        <b-button :size="lg" :variant="primary"><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
-                    </div>
-                    <div v-else>
-                        <b-button :size="lg" :variant="primary" disabled><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></b-button>
-                    </div>
-
-                    <div>
-                        <h4>Recent Pledges</h4>
-                        <p v-for="pledge in recentPledges()">
-                            {{ pledge.username }} pledged {{ pledge.amount / 100}}
-                        </p>
-                    </div>
-                    <br />
-                    Rewards:
-                    <p v-for="reward in getRewards()">
-                        ${{ reward.amount / 100 }}
-                        : {{ reward.description }}
-                    </p>
-                    <br /> <br />
-                </b-col>
-            </b-row>
-            <b-row>
-                <b-col lg="7">
-                    Description:
-                    <p>{{ singleProject.description }}</p>
-                </b-col>
-            </b-row>
-        </b-container>
+        <h2>{{ singleProject.title }}</h2>
+        <img v-bind:src="'http://localhost:4941/api/v2/projects/' + $route.params.projectId + '/image'" />
+        <br />
+        Update Image <input type="file" accept="image/jpeg,image/png" @change="onImageChange($event)">
+        <button type="button" @click="updateImage()" class="btn btn-primary">Update Image</button>
+        <br /><br />
+        <div class="btn-group" v-if="projectOpen">
+            <button type="button" @click="closeProject()" class="btn btn-primary">Close Project</button>
+            <button class="btn btn-primary"><router-link style="color:white" :to="{ name: 'myProjects'}">Back to My Projects</router-link></button>
+        </div>
+        <div class="btn-group" v-else>
+            <button type="button" class="btn btn-primary disabled">Project already closed.</button>
+            <button class="btn btn-primary"><router-link style="color:white" :to="{ name: 'myProjects'}">Back to My Projects</router-link></button>
+        </div>
     </div>
 </template>
 
@@ -123,69 +79,47 @@
                 errorFlag: false,
                 singleProject: "",
                 cUsername: "",
-                cPassword: ""
+                cPassword: "",
+                projectOpen: true,
+                newImage: "",
+                type: ""
             }
         },
         mounted: function (){
             this.getSingleProjectDetails(this.$route.params.projectId);
         },
         methods: {
+            giveError: function(){
+                this.error += "ERROR";
+                this.errorFlag = true;
+            },
             getSingleProjectDetails: function(id){
                 this.$http.get("http://localhost:4941/api/v2/projects/" + id)
                     .then(function (response) {
                         this.singleProject = response.data;
+                        this.projectOpen = response.data.open;
                     }, function (error) {
                         this.error = error;
                         this.errorFlag = true;
                     });
             },
-            getCreators: function(){
-                return this.singleProject.creators;
+            onImageChange: function(event){
+                this.newImage = event.target.files[0];
             },
-            getRewards: function(){
-                return this.singleProject.rewards;
-            },
-            getDate: function(){
-                let date = new Date(this.singleProject.creationDate);
-                return date.toLocaleDateString();
-            },
-            recentPledges: function(){
-                let pledges = this.singleProject.backers;
-                let recentPledges = [];
-                let finalCount = 0;
-                let currentIndex = 0;
-                let anonBacker = false;
-                while(finalCount < 5){
-                    if(currentIndex >= pledges.length){
-                        break;
+            updateImage: function(){
+                this.$http.put("http://localhost:4941/api/v2/projects/" + this.$route.params.projectId + "/image", this.newImage, {
+                    headers: {
+                        'Content-Type': 'image/png',
+                        'X-Authorization': this.$store.state.authenticationToken
                     }
-                    if(pledges[currentIndex].username === "anonymous"){
-                        if(!anonBacker ){
-                            anonBacker = true;
-                            recentPledges.push(this.getAnonBacker(currentIndex));
-                            finalCount += 1;
-                        }
-                    }else{
-                        recentPledges.push(pledges[currentIndex]);
-                        finalCount += 1;
-                    }
-                    currentIndex += 1;
-                }
-                return recentPledges;
-            },
-            getAnonBacker: function(){
-                let pledges = this.singleProject.backers;
-                let anonBacker = {
-                    id: 0,
-                    username: "anonymous",
-                    amount: 0
-                };
-                for(let i = 0; i < pledges.length; i++){
-                    if(pledges[i].username === "anonymous"){
-                        anonBacker.amount += pledges[i].amount;
-                    }
-                }
-                return anonBacker;
+                }).then(function(response){
+                    this.getSingleProjectDetails(this.$route.params.projectId);
+                    this.$router.push({ name: 'editProject', params: { projectId: this.singleProject.id } });
+                    this.newImage = "";
+                }, function(error){
+                    this.error = error;
+                    this.errorFlag = true;
+                });
             },
             logIn: function(){
                 this.errorFlag = false;

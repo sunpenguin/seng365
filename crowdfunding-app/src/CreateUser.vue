@@ -20,8 +20,8 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li class="active"><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
 
-                        <li class="dropdown disabled">
-                            <router-link :to="{ name: 'createUser' }" class="dropdown-toggle disabled" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
+                        <li class="dropdown">
+                            <router-link :to="{ name: 'createUser' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
 
                             <ul class="dropdown-menu">
                                 <li>
@@ -176,8 +176,7 @@
                     this.$store.commit('changeToken', response.data.token);
                     this.cUsername = "";
                     this.cPassword = "";
-                    this.error = "Successfully created and logged in.";
-                    this.errorFlag = true;
+                    this.$router.push({ name: 'projects' });
                 }, function(error) {
                     this.error = error;
                     this.errorFlag = true;

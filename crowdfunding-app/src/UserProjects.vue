@@ -56,11 +56,19 @@
 
             <ul v-else>
                 <div id="projectsList">
-                    <li class="projectSummary" v-for="project in projects">
-                        <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
-                        <h4>{{ project.title }}</h4>
-                        <p>{{ project.subtitle }}</p>
-                        <router-link :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Project Details</router-link>
+                    <li v-for="project in projects">
+                        <div class="projectSummary" v-if="project.open">
+                            <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
+                            <h4>{{ project.title }}</h4>
+                            <p>{{ project.subtitle }}</p>
+                            <router-link :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Project Details</router-link>
+                        </div>
+                        <div class="projectSummary" v-else>
+                            <img style="opacity: 0.5" v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
+                            <h4 style="color: grey">{{ project.title }}</h4>
+                            <p style="color: grey">{{ project.subtitle }}</p>
+                            <router-link :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Closed Project Details</router-link>
+                        </div>
                     </li>
                 </div>
             </ul>
@@ -87,7 +95,6 @@
             getMyProjects: function(){
                 this.$http.get("http://localhost:4941/api/v2/projects", {
                     params: {
-                        open: true,
                         creator: this.$store.state.userId
                     }
                 })
