@@ -157,6 +157,7 @@
                     this.$store.commit('changeToken', response.data.token);
                     this.cUsername = "";
                     this.cPassword = "";
+                    this.$router.push({ name: 'projects' });
                 }, function(error) {
                     this.error = error;
                     this.errorFlag = true;

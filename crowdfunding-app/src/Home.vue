@@ -20,14 +20,7 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><router-link :to="{ name: 'createUser' }"><span class="glyphicon glyphicon-user"></span> Create Account</router-link></li>
 
-                        <!--<li>-->
-                            <!--<b-btn v-b-modal.logInModal>Log In Modal</b-btn>-->
-                            <!--<b-modal id="logInModal" title="Log In">-->
-                                <!--<form @submit.stop.prevent=""-->
-                            <!--</b-modal>-->
-                        <!--</li>-->
-
-                        <li class="dropdown">
+                        <li class="dropdown" id="logInDropdown">
                             <router-link :to="{ name: 'projects' }" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b><span class="caret"></span></router-link>
 
                             <ul class="dropdown-menu">
@@ -56,6 +49,37 @@
                 </div>
             </div>
         </nav>
+
+        <!--<b-navbar toggleable="md" type="dark" variant="info">-->
+            <!--<b-nav-toggle target="nav_collapse"></b-nav-toggle>-->
+            <!--<b-navbar-brand><router-link class="navbar-brand" :to="{ name: 'projects' }">Crowdfunding Website</router-link></b-navbar-brand>-->
+            <!--<b-collapse is-nav id="nav_collapse">-->
+                <!--<b-nav is-nav-bar>-->
+                    <!--<b-nav-item><router-link :to="{ name: 'projects' }">Projects</router-link></b-nav-item>-->
+                <!--</b-nav>-->
+                <!--<b-nav is-nav-bar class="ml-auto">-->
+                    <!--<b-nav-item-dropdown text="Log In" right>-->
+                        <!--<b-nav-form>-->
+                            <!--<b-form-group-->
+                                <!--id="usernameEmail1"-->
+                                <!--description="The username or email address to your account."-->
+                                <!--label="Username/Email Address"-->
+                            <!--&gt;-->
+                                <!--<b-form-input id="usernameEmailInput" v-model="cUsername"></b-form-input>-->
+                            <!--</b-form-group>-->
+                            <!--<b-form-group-->
+                                    <!--id="password1"-->
+                                    <!--description="The password of your account."-->
+                                    <!--label="Password"-->
+                            <!--&gt;-->
+                                <!--<b-form-input id="passwordInput" v-model="cPassword" type="password"></b-form-input>-->
+                            <!--</b-form-group>-->
+                            <!--<b-btn size="lg" type="button" @click="logIn()">Log In</b-btn>-->
+                        <!--</b-nav-form>-->
+                    <!--</b-nav-item-dropdown>-->
+                <!--</b-nav>-->
+            <!--</b-collapse>-->
+        <!--</b-navbar>-->
 
         Search Projects <input type="search" v-model="searchString" placeholder="Search Projects" />
         <br /><br />
