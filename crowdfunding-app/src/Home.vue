@@ -10,7 +10,7 @@
                 </ul>
                 <div v-if="this.$store.state.authenticationToken">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
+                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> My Account</router-link></li>
                         <li><router-link :to="{ name: 'myProjects' }"><span class="glyphicon glyphicon-edit"></span> Manage My Projects</router-link></li>
                         <li><router-link @click.native="logOut()" :to="{ name: 'projects'}"><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
                     </ul>
@@ -82,6 +82,8 @@
         <!--</b-navbar>-->
 
         Search Projects <input type="search" v-model="searchString" placeholder="Search Projects" />
+        Show Projects I have backed <input type="checkbox" v-model="backedProjects" />
+        Show Projects I have created <input type="checkbox" v-model="createdProjects" />
         <br /><br />
         <div id="projectsList" v-cloak>
             <ul>
@@ -112,7 +114,9 @@
                 counter: 0,
                 counter2: 0,
                 cUsername: "",
-                cPassword: ""
+                cPassword: "",
+                backedProjects: false,
+                createdProjects: false
             }
         },
         mounted: function (){
@@ -120,21 +124,36 @@
         },
         methods: {
             getProjects: function(){
-                this.$http.get("http://localhost:4941/api/v2/projects", {params: {open: true}})
+                let parameters = {
+                    open: true
+                };
+                if (this.$store.state.userId > 0) {
+                    if(this.backedProjects === true && this.createdProjects === true) {
+                        parameters = {
+                            open: true,
+                            creator: this.$store.state.userId,
+                            backer: this.$store.state.userId
+                        }
+                    } else if(this.backedProjects === true && this.createdProjects === false) {
+                        parameters = {
+                            open: true,
+                            backer: this.$store.state.userId
+                        }
+                    } else if(this.backedProjects === false && this.createdProjects === true) {
+                        parameters = {
+                            open: true,
+                            creator: this.$store.state.userId
+                        }
+                    }
+                }
+
+                this.$http.get("http://localhost:4941/api/v2/projects", {params: parameters})
                     .then(function (response) {
                         this.projects = response.data;
                     }, function (error) {
                         this.error = error;
                         this.errorFlag = true;
                     });
-            },
-            hasSpace: function(){
-                this.counter += 1;
-                if (this.counter < this.counter2) {
-                    return true;
-                }
-                this.counter -= 1;
-                return false;
             },
             logIn: function(){
                 this.errorFlag = false;
@@ -174,6 +193,8 @@
             searchProjects: function(){
                 this.counter = 0;
                 this.counter2 = this.projects.length;
+
+                this.getProjects();
 
                 let projects = this.projects,
                    searchString  = this.searchString;

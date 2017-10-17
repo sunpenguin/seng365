@@ -10,7 +10,7 @@
                 </ul>
                 <div v-if="this.$store.state.authenticationToken">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
+                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> My Account</router-link></li>
                         <li class="active"><router-link :to="{ name: 'myProjects' }"><span class="glyphicon glyphicon-edit"></span> Manage My Projects</router-link></li>
                         <li><router-link @click.native="logOut()" :to="{ name: 'projects'}"><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
                     </ul>
@@ -82,6 +82,7 @@
                 cPassword: "",
                 projectOpen: true,
                 newImage: "",
+                currentImage: "",
                 type: ""
             }
         },
@@ -106,6 +107,20 @@
             onImageChange: function(event){
                 this.newImage = event.target.files[0];
             },
+            closeProject: function(id){
+                this.$http.put("http://localhost:4941/api/v2/projects/" + this.$route.params.projectId, {
+                    open: false
+                }, {
+                    headers: {
+                        'X-Authorization': this.$store.state.authenticationToken
+                    }
+                }).then(function(response){
+                    this.projectOpen = false;
+                }, function(error){
+                    this.error = error;
+                    this.errorFlag = true;
+                });
+            },
             updateImage: function(){
                 this.$http.put("http://localhost:4941/api/v2/projects/" + this.$route.params.projectId + "/image", this.newImage, {
                     headers: {
@@ -114,7 +129,7 @@
                     }
                 }).then(function(response){
                     this.getSingleProjectDetails(this.$route.params.projectId);
-                    this.$router.push({ name: 'editProject', params: { projectId: this.singleProject.id } });
+                    this.$router.push({ name: 'editProject', params: { projectId: this.singleProject.id }});
                     this.newImage = "";
                 }, function(error){
                     this.error = error;

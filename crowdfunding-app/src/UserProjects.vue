@@ -10,7 +10,7 @@
                 </ul>
                 <div v-if="this.$store.state.authenticationToken">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
+                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> My Account</router-link></li>
                         <li class="active"><router-link :to="{ name: 'myProjects' }"><span class="glyphicon glyphicon-edit"></span> Manage My Projects</router-link></li>
                         <li><router-link @click.native="logOut()" :to="{ name: 'projects'}"><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
                     </ul>
@@ -50,8 +50,12 @@
             </div>
         </nav>
             <h1>My Projects</h1>
+
+            <div>
+                <button type="submit" class="btn btn-primary"><router-link style="color:white" :to="{ name: 'createProject' }">Create New Project</router-link></button>
+            </div>
+
             <ul v-if="projects.length === 0">
-                <li>YOU HAVE NO PROJECTS!</li>
             </ul>
 
             <ul v-else>
@@ -67,7 +71,7 @@
                             <img style="opacity: 0.5" v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
                             <h4 style="color: grey">{{ project.title }}</h4>
                             <p style="color: grey">{{ project.subtitle }}</p>
-                            <router-link :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Closed Project Details</router-link>
+                            <router-link :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Project Details (Closed)</router-link>
                         </div>
                     </li>
                 </div>

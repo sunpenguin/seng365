@@ -10,7 +10,7 @@
                 </ul>
                 <div v-if="this.$store.state.authenticationToken">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
+                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> My Account</router-link></li>
                         <li class="active"><router-link :to="{ name: 'myProjects' }"><span class="glyphicon glyphicon-edit"></span> Manage My Projects</router-link></li>
                         <li><router-link @click.native="logOut()" :to="{ name: 'projects'}"><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
                     </ul>
@@ -50,6 +50,45 @@
             </div>
         </nav>
 
+        <div class="container">
+            <div class="form-group row">
+                <label for="inputTitle" class="col-sm-3 col-form-label">Title</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" id="inputTitle" v-model="newTitle" placeholder="Title" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputSubtitle" class="col-sm-3 col-form-label">Subtitle</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" id="inputSubtitle" v-model="newSubtitle" placeholder="Subtitle" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputDescription" class="col-sm-3 col-form-label">Description</label>
+                <div class="col-sm-7">
+                    <input type="text" class="form-control" id="inputDescription" v-model="newDescription" placeholder="Description" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputTarget" class="col-sm-3 col-form-label">Target ($)</label>
+                <div class="col-sm-7">
+                    <input type="number" class="form-control" id="inputTarget" v-model="newTarget" placeholder="Target" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                Update Image
+                <input type="file" accept="image/jpeg,image/png" @change="onImageChange($event)">
+            </div>
+
+            <div class="form-group row">
+                <button @click.native="createProject()" type="submit" class="btn btn-primary">Create Project</button>
+                <router-link :to="{ name: 'myProjects'}"><button type="submit" class="btn btn-primary">Back to My Projects</button></router-link>
+            </div>
+
+            <div class="form-group row" v-if="errorFlag" style="color: red;">
+                {{ error }}
+            </div>
+        </div>
 
     </div>
 </template>
@@ -62,11 +101,15 @@
                 errorFlag: false,
                 singleProject: "",
                 cUsername: "",
-                cPassword: ""
+                cPassword: "",
+
+                newTitle: "",
+                newSubtitle: "",
+                newDescription: "",
+                newTarget: 0,
+                newImage: "",
+                newRewards: []
             }
-        },
-        mounted: function (){
-            this.getSingleProjectDetails(this.$route.params.projectId);
         },
         methods: {
             getSingleProjectDetails: function(id){
@@ -78,53 +121,75 @@
                         this.errorFlag = true;
                     });
             },
-            getCreators: function(){
-                return this.singleProject.creators;
+            onImageChange: function(event){
+                this.newImage = event.target.files[0];
             },
-            getRewards: function(){
-                return this.singleProject.rewards;
-            },
-            getDate: function(){
-                let date = new Date(this.singleProject.creationDate);
-                return date.toLocaleDateString();
-            },
-            recentPledges: function(){
-                let pledges = this.singleProject.backers;
-                let recentPledges = [];
-                let finalCount = 0;
-                let currentIndex = 0;
-                let anonBacker = false;
-                while(finalCount < 5){
-                    if(currentIndex >= pledges.length){
-                        break;
-                    }
-                    if(pledges[currentIndex].username === "anonymous"){
-                        if(!anonBacker ){
-                            anonBacker = true;
-                            recentPledges.push(this.getAnonBacker(currentIndex));
-                            finalCount += 1;
+            createProject: function(){
+                this.errorFlag = false;
+
+                if(!this.newTitle){
+                    this.error = "Please insert a title.";
+                    this.errorFlag = true;
+                    return;
+                }
+
+                if(!this.newSubtitle){
+                    this.error = "Please insert a subtitile.";
+                    this.errorFlag = true;
+                    return;
+                }
+
+                if(!this.newDescription){
+                    this.error = "Please insert a description.";
+                    this.errorFlag = true;
+                    return;
+                }
+
+                if(this.newTarget <= 0){
+                    this.error = "Please insert a valid target.";
+                    this.errorFlag = true;
+                    return;
+                }
+
+                this.$http.post("http://localhost:4941/api/v2/projects", {
+                    title: this.newTitle,
+                    subtitle: this.newSubtitle,
+                    description: this.newDescription,
+                    target: this.newTarget,
+                    creators: [
+                        {
+                            id: this.$store.state.userId
                         }
-                    }else{
-                        recentPledges.push(pledges[currentIndex]);
-                        finalCount += 1;
+                    ],
+                    rewards: this.newRewards
+                }, {
+                    headers: {
+                        'X-Authorization': this.$store.state.authenticationToken,
+                        'Content-Type': 'application/json'
                     }
-                    currentIndex += 1;
-                }
-                return recentPledges;
+                }).then(function(response){
+                    if(newImage){
+                        this.includeImage();
+                    }
+                }, function(error){
+                    this.error = error;
+                    this.errorFlag = true;
+                })
             },
-            getAnonBacker: function(){
-                let pledges = this.singleProject.backers;
-                let anonBacker = {
-                    id: 0,
-                    username: "anonymous",
-                    amount: 0
-                };
-                for(let i = 0; i < pledges.length; i++){
-                    if(pledges[i].username === "anonymous"){
-                        anonBacker.amount += pledges[i].amount;
+            includeImage: function(){
+                this.$http.put("http://localhost:4941/api/v2/projects/" + this.$route.params.projectId + "/image", this.newImage, {
+                    headers: {
+                        'Content-Type': 'image/png',
+                        'X-Authorization': this.$store.state.authenticationToken
                     }
-                }
-                return anonBacker;
+                }).then(function(response){
+                    this.getSingleProjectDetails(this.$route.params.projectId);
+                    this.$router.push({ name: 'editProject', params: { projectId: this.singleProject.id }});
+                    this.newImage = "";
+                }, function(error){
+                    this.error = error;
+                    this.errorFlag = true;
+                });
             },
             logIn: function(){
                 this.errorFlag = false;

@@ -10,7 +10,7 @@
                 </ul>
                 <div v-if="this.$store.state.authenticationToken">
                     <ul class="nav navbar-nav navbar-right">
-                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> JOHN CENA</router-link></li>
+                        <li><router-link :to="{ name: 'user' }"><span class="glyphicon glyphicon-user"></span> My Account</router-link></li>
                         <li><router-link :to="{ name: 'myProjects' }"><span class="glyphicon glyphicon-edit"></span> Manage My Projects</router-link></li>
                         <li><router-link @click.native="logOut()" :to="{ name: 'projects'}" ><span class="glyphicon glyphicon-log-out"></span> Log Out</router-link></li>
                     </ul>
@@ -51,11 +51,8 @@
         </nav>
 
         <div id="user">
+            <h1>My Account Details</h1>
             <br />
-
-            <p>AND HIS NAME IS...</p>
-            <h1>JOHN CENA!</h1>
-
             <div class="container">
                 <div class="form-group row">
                     <label for="inputUsername" class="col-sm-3 col-form-label">Username</label>
