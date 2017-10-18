@@ -149,7 +149,7 @@
                     this.amount = "";
                     this.anonymous = false;
                     this.errorFlag = true;
-                    this.$router.push({ name: 'project', params: { projectId: $route.params.projectId }});
+                    this.$router.push({ name: 'project', params: { projectId: this.$route.params.projectId }});
                 }, function(error){
                     this.error = error;
                     this.errorFlag = true;
