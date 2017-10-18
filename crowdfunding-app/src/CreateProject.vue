@@ -49,8 +49,8 @@
                 </div>
             </div>
         </nav>
-
         <div class="container">
+            <h2>Create New Project</h2>
             <div class="form-group row">
                 <label for="inputTitle" class="col-sm-3 col-form-label">Title</label>
                 <div class="col-sm-7">
@@ -76,12 +76,32 @@
                 </div>
             </div>
             <div class="form-group row">
-                Update Image
-                <input type="file" accept="image/jpeg,image/png" @change="onImageChange($event)">
+                <label for="inputImage" class="col-sm-3 col-form-label">Upload Project Image (optional)</label>
+                <div class="col-sm-7">
+                    <input type="file" accept="image/jpeg,image/png" id="inputImage" @change="onImageChange($event)">
+                </div>
+            </div>
+            <div class="form-group row">
+                <h3>Rewards</h3>
+                <ul v-for="reward in getComputedRewards">
+                    <li>
+                        <label for="inputRewardAmount" class="col-sm-3 col-form-label">Reward Amount ($)</label>
+                        <div class="col-sm-7">
+                            <input type="number" accept="image/jpeg,image/png" id="inputRewardAmount" v-model="reward.amount">
+                        </div>
+
+                        <label for="inputRewardDescription" class="col-sm-3 col-form-label">Reward Description</label>
+                        <div class="col-sm-7">
+                            <input type="text" accept="image/jpeg,image/png" id="inputRewardDescription" v-model="reward.description">
+                        </div>
+                    </li>
+                </ul>
+                <button type="button" @click="removeLastReward()">Remove Last Reward</button>
+                <button type="button" @click="addNewReward()">Add New Reward</button>
             </div>
 
             <div class="form-group row">
-                <button @click.native="createProject()" type="submit" class="btn btn-primary">Create Project</button>
+                <button @click="createProject()" type="submit" class="btn btn-primary">Create Project</button>
                 <router-link :to="{ name: 'myProjects'}"><button type="submit" class="btn btn-primary">Back to My Projects</button></router-link>
             </div>
 
@@ -108,7 +128,8 @@
                 newDescription: "",
                 newTarget: 0,
                 newImage: "",
-                newRewards: []
+                newRewards: [],
+                newProjId: 0
             }
         },
         methods: {
@@ -123,6 +144,11 @@
             },
             onImageChange: function(event){
                 this.newImage = event.target.files[0];
+            },
+            convertRewards: function(){
+                for(let i = 0; i < this.newRewards.length; i++){
+                    this.newRewards[i].amount = parseInt(this.newRewards[i].amount) * 100;
+                }
             },
             createProject: function(){
                 this.errorFlag = false;
@@ -151,11 +177,13 @@
                     return;
                 }
 
+                this.convertRewards();
+
                 this.$http.post("http://localhost:4941/api/v2/projects", {
                     title: this.newTitle,
                     subtitle: this.newSubtitle,
                     description: this.newDescription,
-                    target: this.newTarget,
+                    target: parseInt(this.newTarget),
                     creators: [
                         {
                             id: this.$store.state.userId
@@ -168,28 +196,36 @@
                         'Content-Type': 'application/json'
                     }
                 }).then(function(response){
-                    if(newImage){
-                        this.includeImage();
-                    }
+                    this.newProjId = response.body.id;
+                    this.includeImage();
                 }, function(error){
                     this.error = error;
                     this.errorFlag = true;
                 })
             },
             includeImage: function(){
-                this.$http.put("http://localhost:4941/api/v2/projects/" + this.$route.params.projectId + "/image", this.newImage, {
+                this.$http.put("http://localhost:4941/api/v2/projects/" + this.newProjId + "/image", this.newImage, {
                     headers: {
                         'Content-Type': 'image/png',
                         'X-Authorization': this.$store.state.authenticationToken
                     }
                 }).then(function(response){
                     this.getSingleProjectDetails(this.$route.params.projectId);
-                    this.$router.push({ name: 'editProject', params: { projectId: this.singleProject.id }});
+                    this.$router.push({ name: 'myProjects' });
                     this.newImage = "";
                 }, function(error){
                     this.error = error;
                     this.errorFlag = true;
                 });
+            },
+            addNewReward: function() {
+                this.newRewards.push({
+                    amount: 0,
+                    description: ""
+                });
+            },
+            removeLastReward: function() {
+                this.newRewards.pop();
             },
             logIn: function(){
                 this.errorFlag = false;
@@ -222,6 +258,17 @@
                     this.error = "Error Logging Out!";
                     this.errorFlag = true;
                 });
+            }
+        },
+        computed: {
+            getComputedRewards: function(){
+                if(this.newRewards.length < 1) {
+                    this.newRewards.push({
+                        amount: 0,
+                        description: ""
+                    })
+                }
+                return this.newRewards;
             }
         }
     }

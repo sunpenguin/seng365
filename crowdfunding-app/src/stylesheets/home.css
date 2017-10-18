@@ -1,7 +1,8 @@
 .projectSummary {
-    text-align: justify;
+    text-align: center;
     height: 300px;
     width: 300px;
+    margin: 25px;
 }
 
 .projectSummary img {
@@ -9,17 +10,21 @@
     height: 100%;
     object-fit: cover;
     overflow: hidden;
-    display: block
+    display: inline-block;
 }
 
+#projectSummary {
+    border: 1px solid black;
+    padding-bottom: 10px;
+}
 
 .projectSummary p {
-    width: 300px;
+    width: 100%;
     height: 100px;
 }
 
 .projectSummary h4 {
-    width: 300px;
+    width: 100%;
     height: 50px;
 }
 
@@ -36,7 +41,6 @@ h1, h2 {
 
 ul {
     list-style-type: none;
-    padding: 0;
 }
 
 li {

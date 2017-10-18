@@ -49,54 +49,53 @@
                 </div>
             </div>
         </nav>
+        <div class="row">
+            <div class="col-lg-3"></div>
+            <div class="col-lg-6">
+                <div class="input-group" id="homeTop">
+                    <div class="input-group-addon" id="searchText">Search Projects</div>
+                    <input class="form-control" type="search" v-model="searchString" placeholder="Search Projects" aria-describedby="searchText"/>
+                </div>
+            </div>
+            <div class="col-lg-3"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4"></div>
+            <div class="col-lg-2">
+                <div class="input-group">
+                    <label id="checkboxBacked">Show Projects I have backed:</label>
+                    <input type="checkbox" v-model="backedProjects" />
+                </div>
+            </div>
 
-        <!--<b-navbar toggleable="md" type="dark" variant="info">-->
-            <!--<b-nav-toggle target="nav_collapse"></b-nav-toggle>-->
-            <!--<b-navbar-brand><router-link class="navbar-brand" :to="{ name: 'projects' }">Crowdfunding Website</router-link></b-navbar-brand>-->
-            <!--<b-collapse is-nav id="nav_collapse">-->
-                <!--<b-nav is-nav-bar>-->
-                    <!--<b-nav-item><router-link :to="{ name: 'projects' }">Projects</router-link></b-nav-item>-->
-                <!--</b-nav>-->
-                <!--<b-nav is-nav-bar class="ml-auto">-->
-                    <!--<b-nav-item-dropdown text="Log In" right>-->
-                        <!--<b-nav-form>-->
-                            <!--<b-form-group-->
-                                <!--id="usernameEmail1"-->
-                                <!--description="The username or email address to your account."-->
-                                <!--label="Username/Email Address"-->
-                            <!--&gt;-->
-                                <!--<b-form-input id="usernameEmailInput" v-model="cUsername"></b-form-input>-->
-                            <!--</b-form-group>-->
-                            <!--<b-form-group-->
-                                    <!--id="password1"-->
-                                    <!--description="The password of your account."-->
-                                    <!--label="Password"-->
-                            <!--&gt;-->
-                                <!--<b-form-input id="passwordInput" v-model="cPassword" type="password"></b-form-input>-->
-                            <!--</b-form-group>-->
-                            <!--<b-btn size="lg" type="button" @click="logIn()">Log In</b-btn>-->
-                        <!--</b-nav-form>-->
-                    <!--</b-nav-item-dropdown>-->
-                <!--</b-nav>-->
-            <!--</b-collapse>-->
-        <!--</b-navbar>-->
+            <div class="col-lg-2">
+                <div class="input-group">
+                    <label>Show Projects I have created </label>
+                    <input type="checkbox" v-model="createdProjects" />
+                </div>
+            </div>
+            <div class="col-lg-4"></div>
+        </div>
 
-        Search Projects <input type="search" v-model="searchString" placeholder="Search Projects" />
-        Show Projects I have backed <input type="checkbox" v-model="backedProjects" />
-        Show Projects I have created <input type="checkbox" v-model="createdProjects" />
+
         <br /><br />
         <div id="projectsList" v-cloak>
             <ul>
                 <li class="projectSummary" v-for="project in searchProjects">
                     <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
-                    <h4>{{ project.title }}</h4>
-                    <p>{{ project.subtitle }}</p>
-                    <router-link :to="{ name: 'project', params: { projectId: project.id }}">View Details</router-link>
+                    <div class="card">
+                        <div class="card-body" id="projectSummary">
+                            <h4 class="card-title">{{ project.title }}</h4>
+                            <p class="card-subtitle mb-2 text-muted">{{ project.subtitle }}</p>
+                            <router-link class="btn btn-primary" :to="{ name: 'project', params: { projectId: project.id }}">View Details</router-link>
+                        </div>
+                    </div>
+
+
                 </li>
             </ul>
             <br />
             <p>{{ $store.state.authenticationToken }}</p>
-            <p>Counter: {{ counter }}, Range: {{ sRange }}, AuthToken: {{ projects.length }}, {{ counter2 }}</p>
         </div>
     </div>
 </template>
@@ -110,9 +109,6 @@
                 errorFlag: false,
                 projects: [],
                 authToken: "",
-                sRange: 1,
-                counter: 0,
-                counter2: 0,
                 cUsername: "",
                 cPassword: "",
                 backedProjects: false,
@@ -130,18 +126,15 @@
                 if (this.$store.state.userId > 0) {
                     if(this.backedProjects === true && this.createdProjects === true) {
                         parameters = {
-                            open: true,
                             creator: this.$store.state.userId,
                             backer: this.$store.state.userId
                         }
                     } else if(this.backedProjects === true && this.createdProjects === false) {
                         parameters = {
-                            open: true,
                             backer: this.$store.state.userId
                         }
                     } else if(this.backedProjects === false && this.createdProjects === true) {
                         parameters = {
-                            open: true,
                             creator: this.$store.state.userId
                         }
                     }
@@ -191,9 +184,6 @@
         },
         computed: {
             searchProjects: function(){
-                this.counter = 0;
-                this.counter2 = this.projects.length;
-
                 this.getProjects();
 
                 let projects = this.projects,

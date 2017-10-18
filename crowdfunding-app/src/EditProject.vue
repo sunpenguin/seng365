@@ -65,9 +65,11 @@
             <button class="btn btn-primary"><router-link style="color:white" :to="{ name: 'myProjects'}">Back to My Projects</router-link></button>
         </div>
         <div class="btn-group" v-else>
-            <button type="button" class="btn btn-primary disabled">Project already closed.</button>
+            <button type="button" class="btn btn-primary disabled">Project is closed.</button>
             <button class="btn btn-primary"><router-link style="color:white" :to="{ name: 'myProjects'}">Back to My Projects</router-link></button>
         </div>
+        <br>
+        {{ changeText }}
     </div>
 </template>
 
@@ -82,8 +84,8 @@
                 cPassword: "",
                 projectOpen: true,
                 newImage: "",
-                currentImage: "",
-                type: ""
+                type: "",
+                changeText: ""
             }
         },
         mounted: function (){
@@ -108,6 +110,7 @@
                 this.newImage = event.target.files[0];
             },
             closeProject: function(id){
+                this.changeText = "";
                 this.$http.put("http://localhost:4941/api/v2/projects/" + this.$route.params.projectId, {
                     open: false
                 }, {
@@ -115,6 +118,7 @@
                         'X-Authorization': this.$store.state.authenticationToken
                     }
                 }).then(function(response){
+                    this.changeText = "The project is now closed.";
                     this.projectOpen = false;
                 }, function(error){
                     this.error = error;
@@ -122,14 +126,17 @@
                 });
             },
             updateImage: function(){
+                this.changeText = "";
                 this.$http.put("http://localhost:4941/api/v2/projects/" + this.$route.params.projectId + "/image", this.newImage, {
                     headers: {
                         'Content-Type': 'image/png',
-                        'X-Authorization': this.$store.state.authenticationToken
+                        'X-Authorization': this.$store.state.authenticationToken,
+                        "Cache-Control": 'no-cache'
                     }
                 }).then(function(response){
-                    this.getSingleProjectDetails(this.$route.params.projectId);
-                    this.$router.push({ name: 'editProject', params: { projectId: this.singleProject.id }});
+                    this.changeText = "Image has been updated.";
+//                    this.$router.push({ name: 'editProject', params: { projectId: this.singleProject.id }});
+                    this.$router.push({ name: 'myProjects' });
                     this.newImage = "";
                 }, function(error){
                     this.error = error;
@@ -168,6 +175,17 @@
                     this.error = "Error Logging Out!";
                     this.errorFlag = true;
                 });
+            }
+        },
+        computed: {
+            getComputedRewards: function(){
+                if(this.newRewards.length < 1) {
+                    this.newRewards.push({
+                        amount: 0,
+                        description: ""
+                    })
+                }
+                return this.newRewards;
             }
         }
     }
