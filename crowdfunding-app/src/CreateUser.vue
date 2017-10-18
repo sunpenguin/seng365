@@ -50,28 +50,30 @@
             </div>
         </nav>
 
-        <div class="container">
+        <div class="container" id="newUserForm">
+            <h2>Create new account</h2>
+            <br />
             <div class="form-group row">
-                <label for="inputUsername" class="col-sm-3 col-form-label">Username</label>
-                <div class="col-sm-7">
+                <label for="inputUsername" class="col-lg-3 col-form-label">Username</label>
+                <div class="col-lg-7">
                     <input type="text" class="form-control" id="inputUsername" v-model="newUsername" placeholder="Username" required>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="inputEmail" class="col-sm-3 col-form-label">Email Address</label>
-                <div class="col-sm-7">
+                <label for="inputEmail" class="col-lg-3 col-form-label">Email Address</label>
+                <div class="col-lg-7">
                     <input type="email" class="form-control" id="inputEmail" v-model="newEmail" placeholder="Email Address" required>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="inputPassword" class="col-sm-3 col-form-label">Password</label>
-                <div class="col-sm-7">
+                <label for="inputPassword" class="col-lg-3 col-form-label">Password</label>
+                <div class="col-lg-7">
                     <input type="password" class="form-control" id="inputPassword" v-model="newPassword" placeholder="Password" required>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="inputLocation" class="col-sm-3 col-form-label">Location</label>
-                <div class="col-sm-7">
+                <label for="inputLocation" class="col-lg-3 col-form-label">Location</label>
+                <div class="col-lg-7">
                     <input type="text" class="form-control" id="inputLocation" v-model="newLocation" placeholder="Location (optional)">
                 </div>
             </div>

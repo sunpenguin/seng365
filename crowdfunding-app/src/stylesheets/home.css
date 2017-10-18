@@ -16,6 +16,7 @@
 #projectSummary {
     border: 1px solid black;
     padding-bottom: 10px;
+    background: rgba(211, 211, 211, 0.5);
 }
 
 .projectSummary p {
@@ -33,6 +34,12 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #000000;
+
+    background: #acb6e5;
+    background: -webkit-linear-gradient(left, #acb6e5, #86fde8);
+    background: -o-linear-gradient(right, #acb6e5, #86fde8);
+    background: -moz-linear-gradient(right, #acb6e5, #86fde8);
+    background: linear-gradient(to right, #acb6e5, #86fde8);
 }
 
 h1, h2 {
@@ -71,4 +78,8 @@ a {
 
 #pledgeForm {
     padding: 2.5%;
+}
+
+#newUserForm {
+    text-align: center;
 }
