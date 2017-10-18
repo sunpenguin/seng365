@@ -77,10 +77,10 @@
 
                     <br />
                     <div if v-if="singleProject.open">
-                        <button class="btn btn-primary"><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></button>
+                        <li class="btn btn-primary"><router-link :to="{ name: 'pledge', params: { projectId: this.$route.params.projectId } }">Back this project!</router-link></li>
                     </div>
                     <div v-else>
-                        <button class="btn btn-primary" disabled><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Back this project!</router-link></button>
+                        <li class="btn btn-primary" disabled><router-link :to="{ name: 'pledge', params: { projectId: $route.params.projectId } }">Project closed!</router-link></li>
                     </div>
 
                     <div>

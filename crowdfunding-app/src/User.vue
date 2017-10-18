@@ -51,9 +51,9 @@
         </nav>
 
         <div id="user">
-            <h1>My Account Details</h1>
-            <br />
-            <div class="container">
+            <div class="container" id="newUserForm">
+                <h2>My Account Details</h2>
+                <br />
                 <div class="form-group row">
                     <label for="inputUsername" class="col-sm-3 col-form-label">Username</label>
                     <div class="col-sm-7">
@@ -80,7 +80,7 @@
                 </div>
                 <div class="form-group row">
                     <button @click="editAccount()" type="submit" class="btn btn-primary">Edit Account</button>
-                    <router-link :to="{ name: 'projects'}"><button type="submit" class="btn btn-primary">Back to Projects</button></router-link>
+                    <li type="submit" class="btn btn-primary"><router-link :to="{ name: 'projects'}">Back to Projects</router-link></li>
                 </div>
                 <div class="form-group row" v-if="errorFlag" style="color: red;">
                     {{ error }}

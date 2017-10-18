@@ -52,32 +52,39 @@
             <h1>My Projects</h1>
 
             <div>
-                <button type="submit" class="btn btn-primary"><router-link style="color:white" :to="{ name: 'createProject' }">Create New Project</router-link></button>
+                <li type="submit" class="btn btn-primary"><router-link style="color:white" :to="{ name: 'createProject' }">Create New Project</router-link></li>
             </div>
 
             <ul v-if="projects.length === 0">
+                <h3>You currently have no projects created.</h3>
             </ul>
 
             <ul v-else>
                 <div id="projectsList">
                     <li v-for="project in projects">
                         <div class="projectSummary" v-if="project.open">
-                            <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
-                            <h4>{{ project.title }}</h4>
-                            <p>{{ project.subtitle }}</p>
-                            <router-link :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Project Details</router-link>
+                            <img v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image/?time=' + getCurrentDate()" />
+                            <div class="card">
+                                <div class="card-body" id="projectSummary">
+                                    <h4 class="card-title">{{ project.title }}</h4>
+                                    <p class="card-subtitle mb-2 text-muted">{{ project.subtitle }}</p>
+                                    <router-link class="btn btn-primary" :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Project Details</router-link>
+                                </div>
+                            </div>
                         </div>
                         <div class="projectSummary" v-else>
                             <img style="opacity: 0.5" v-bind:src="'http://localhost:4941/api/v2/projects/' + project.id + '/image'" />
-                            <h4 style="color: grey">{{ project.title }}</h4>
-                            <p style="color: grey">{{ project.subtitle }}</p>
-                            <router-link :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Project Details (Closed)</router-link>
+                            <div class="card">
+                                <div class="card-body" id="projectSummary">
+                                    <h4 style="color: grey" class="card-title">{{ project.title }}</h4>
+                                    <p class="card-subtitle mb-2 text-muted">{{ project.subtitle }}</p>
+                                    <router-link class="btn btn-primary" :to="{ name: 'editProject', params: { projectId: project.id }}">Edit Project Details (Closed)</router-link>
+                                </div>
+                            </div>
                         </div>
                     </li>
                 </div>
             </ul>
-
-        <p>{{ error }}</p>
     </div>
 </template>
 
@@ -85,7 +92,7 @@
     export default {
         data() {
             return {
-                error: "ENGLAND IS MY CITY!",
+                error: "",
                 errorFlag: false,
                 projects: [],
                 cUsername: "",
@@ -96,6 +103,9 @@
             this.getMyProjects();
         },
         methods: {
+            getCurrentDate: function() {
+                return Date.now();
+            },
             getMyProjects: function(){
                 this.$http.get("http://localhost:4941/api/v2/projects", {
                     params: {

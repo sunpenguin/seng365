@@ -82,7 +82,7 @@
             </div>
             <div class="form-group row">
                 <button @click="createNewUser()" type="submit" class="btn btn-primary">Create Account</button>
-                <router-link :to="{ name: 'projects'}"><button type="submit" class="btn btn-primary">Cancel</button></router-link>
+                <li type="submit" class="btn btn-primary"><router-link :to="{ name: 'projects'}">Cancel</router-link></li>
             </div>
         </div>
     </div>

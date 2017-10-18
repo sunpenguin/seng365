@@ -102,7 +102,7 @@
 
             <div class="form-group row">
                 <button @click="createProject()" type="submit" class="btn btn-primary">Create Project</button>
-                <router-link :to="{ name: 'myProjects'}"><button type="submit" class="btn btn-primary">Back to My Projects</button></router-link>
+                <li class="btn btn-primary"><router-link :to="{ name: 'myProjects'}">Back to My Projects</router-link></li>
             </div>
 
             <div class="form-group row" v-if="errorFlag" style="color: red;">

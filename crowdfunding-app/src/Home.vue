@@ -95,7 +95,6 @@
                 </li>
             </ul>
             <br />
-            <p>{{ $store.state.authenticationToken }}</p>
         </div>
     </div>
 </template>

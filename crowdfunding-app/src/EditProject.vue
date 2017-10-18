@@ -62,11 +62,11 @@
         <br /><br />
         <div class="btn-group" v-if="projectOpen">
             <button type="button" @click="closeProject()" class="btn btn-primary">Close Project</button>
-            <button class="btn btn-primary"><router-link style="color:white" :to="{ name: 'myProjects'}">Back to My Projects</router-link></button>
+            <li class="btn btn-primary"><router-link style="color:white" :to="{ name: 'myProjects'}">Back to My Projects</router-link></li>
         </div>
         <div class="btn-group" v-else>
             <button type="button" class="btn btn-primary disabled">Project is closed.</button>
-            <button class="btn btn-primary"><router-link style="color:white" :to="{ name: 'myProjects'}">Back to My Projects</router-link></button>
+            <li class="btn btn-primary"><router-link style="color:white" :to="{ name: 'myProjects'}">Back to My Projects</router-link></li>
         </div>
         <br>
         {{ changeText }}
@@ -135,7 +135,6 @@
                     }
                 }).then(function(response){
                     this.changeText = "Image has been updated.";
-//                    this.$router.push({ name: 'editProject', params: { projectId: this.singleProject.id }});
                     this.$router.push({ name: 'myProjects' });
                     this.newImage = "";
                 }, function(error){
